@@ -62,4 +62,19 @@ class Contestant extends Model{
         return $total_score_percentage;
     }
 
+    public function getScoreByJudge($judge_id, $criteria_id, $contestant_id){
+        $score = new Score();
+
+        $scores = $score->findBy('criteria_id', $criteria_id);
+
+        $total = 0;
+
+        foreach($scores as $s){
+            if($s->contestant_id == $contestant_id && $s->judge_id == $judge_id){
+                $total += $s->score;
+            }
+        }
+
+        return $total;
+    }
 }

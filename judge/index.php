@@ -223,6 +223,32 @@ $e = $event->find($j->event_id);
         </div>
     </div>
 
+    <div class="modal fade" id="proceed-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="scrollableModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="jumbotron container text-center py-5">
+
+                    <h4 class="text-uppercase" id="criteria-label-modal"></h4>
+
+                        <h5 class="modal-title fw-bold" id="scrollableModalTitle">
+                            Successfully submitted your score! Thank you!
+                        </h5>
+                        
+                        <br>
+                        <br>
+
+                        <button type="button" class="btn btn-success" id="proceed-btn" disabled>
+                            <i class="bi bi-check-circle"></i>
+                            Proceed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
         <i class="bi bi-arrow-up-short"></i>
     </a>
@@ -240,8 +266,8 @@ $e = $event->find($j->event_id);
                 localStorage.setItem('notice', 'true');
             }
 
-            var judge_id = <?= $j-> id; ?>;
-            var event_id = <?= $j-> event_id; ?>;
+            var judge_id = <?= $j->id; ?>;
+            var event_id = <?= $j->event_id; ?>;
             var criteria_id = 0;
             var contestant_id = 0;
 
@@ -287,9 +313,38 @@ $e = $event->find($j->event_id);
 
                         $("#criteria-label").html(obj.criteria.criteria_name + " (" + obj.criteria
                             .criteria_percentage + "%)");
+                        
+                        $("#criteria-label-modal").html(obj.criteria.criteria_name + " (" + obj.criteria
+                            .criteria_percentage + "%)");
 
                         $("#criteria-id").html(obj.criteria.id);
                         criteria_id = obj.criteria.id;
+
+                        // check if the criteria is already scored
+                        // setInterval(function () {
+                        //     $.ajax({
+                        //         url: "./../backend/judge/check-criteria-scored.php",
+                        //         type: "POST",
+                        //         data: {
+                        //             criteria_id: obj.criteria.id,
+                        //             judge_id: judge_id,
+                        //             event_id: event_id
+                        //         },
+                        //         async: false,
+                        //         success: function (data) {
+                        //             var obj = JSON.parse(data);
+
+                        //             if (obj.status == "scored") {
+                        //                 $("#submit-all-score").attr('disabled', 'disabled');
+                        //                 $("#proceed-btn").removeAttr('disabled');
+                        //             } else {
+                        //                 $("#submit-all-score").removeAttr('disabled');
+                        //                 $("#proceed-btn").attr('disabled', 'disabled');
+                        //             }
+                        //         }
+                        //     });
+                        // }, 1000);
+
                     }
                 });
             }
@@ -340,6 +395,7 @@ $e = $event->find($j->event_id);
                             var obj = JSON.parse(data);
                             if (obj.status == 'success') {
                                 location.reload();
+                                // $("#proceed-modal").modal('show');
                                 $("#submit-all-score").attr('disabled', 'disabled');
                             }
                         }
@@ -347,14 +403,20 @@ $e = $event->find($j->event_id);
                 }
             });
 
+            $("#proceed-btn").on('click', function () {
+                location.reload();
+            });
+
             $(document).ready(function () {
                 CheckEvent();
                 setInterval(function () {
                     CheckEvent();
-                    FetchCriteriaData();    
+                    FetchCriteriaData();
+                    FetchContestant();    
                 }, 2000);
                 FetchCriteriaData();
                 FetchContestant();
+
             });
         });
     </script>

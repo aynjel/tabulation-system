@@ -17,5 +17,6 @@ foreach($cri as $c){
     }
 }
 echo json_encode([
+    'status' => 'success',
     'criteria' => $cr
 ], JSON_PRETTY_PRINT);

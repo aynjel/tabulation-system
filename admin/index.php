@@ -31,6 +31,8 @@ $events = $event->all();
     <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../node_modules/toastr/build/toastr.min.css">
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/buttons.dataTables.min.css">
 
     <link rel="stylesheet" href="./css/admin.css">
     <link rel="stylesheet" href="./css/style.css">
@@ -41,7 +43,7 @@ $events = $event->all();
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
-            <a href="index.html" class="logo d-flex align-items-center">
+            <a href="index.php" class="logo d-flex align-items-center">
                 <span class="d-none d-lg-block">
                     <span class="text-primary">Admin</span> Dashboard
                 </span>
@@ -183,6 +185,12 @@ $events = $event->all();
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../node_modules/toastr/build/toastr.min.js"></script>
     <script src="../node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../node_modules/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="../node_modules/datatables.net/js/buttons.print.min.js"></script>
+    <script src="../node_modules/datatables.net/js/buttons.html5.min.js"></script>
+    <script src="../node_modules/datatables.net/js/jszip.min.js"></script>
+    <script src="../node_modules/datatables.net/js/pdfmake.min.js"></script>
 
     <script src="./js/main.js"></script>
     <script type="text/javascript">
@@ -208,6 +216,36 @@ $events = $event->all();
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
             }
+        }
+
+        function export_excel(table, title) {
+            $(table).DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: title,
+                        text:'Export Excel',
+                        titleAttr: 'Export Excel',
+                        "oSelectorOpts": {filter: 'applied', order: 'current'},
+                        exportOptions: {
+                                modifier: {
+                                page: 'all'
+                                },
+                                    format: {
+                                        header: function ( data, columnIdx ) {
+                                            if(columnIdx==1){
+                                            return 'Account Number';
+                                            }
+                                            else{
+                                            return data;
+                                            }
+                                        }
+                                    }
+                            }
+                    },
+                ]
+            });
         }
 
         function FetchEventData(id) {
@@ -260,7 +298,7 @@ $events = $event->all();
                         criteria_html += "<td>" + criteria[i].criteria_percentage + "</td>";
                         criteria_html += "<td>" + criteria[i].is_show + "</td>";
                         criteria_html +=
-                            "<td><button class='btn btn-sm btn-primary' onclick='ViewResult(" + criteria[i].id + ")'>Result</button></td>";
+                            "<td><a class='btn btn-sm btn-primary' href='criteria-result.php?criteria_id=" + criteria[i].id + "'>Result</a></td>";
                         criteria_html += "</tr>";
                     }
                     $("#e-criterias-table tbody").html(criteria_html);
@@ -1054,8 +1092,48 @@ $events = $event->all();
             });
 
             $("#result-event").on('click', function () {
-                window.location.href = "./index.php?page=result";
+                window.location.href = "./index.php?page=result-export";
             });
+
+            $("#resultTable").DataTable({
+                paging: false,
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6]
+                }
+            });
+
+            $("#criteria-result-table").DataTable({
+                paging: false,
+                dom: 'Bfrtip',
+                // buttons: [
+                //     'copy', 'csv', 'excel', 'pdf', 'print'
+                // ],
+                buttons: [
+                    {
+                        extend: 'print',
+                        title: 'Criteria Result',
+                        text: 'Print',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        title: 'Criteria Result',
+                        text: 'Excel',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                ]
+            });
+
+            
+            // export_excel('#pinamungajan_table', 'Pinamungajan Customers List');
         });
     </script>
 

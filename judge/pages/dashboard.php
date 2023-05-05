@@ -64,10 +64,10 @@
                                                 }else{?>
                                                 <form class="form-score">
                                                     <input type="hidden" name="contestant_id" value="<?= $con->id; ?>">
-                                                    <input type="hidden" name="judge_id" value="<?= $j->id; ?>">
+                                                    <input type="hidden" name="judge_id" value="<?= Session::get('judge_id'); ?>">
                                                     <input type="hidden" name="event_id" value="<?= $e->id; ?>">
                                                     <!-- <input type="hidden" name="criteria_id" value="<?= $cri->id; ?>"> -->
-                                                    <input type="number" class="form-control" name="score" id="score"
+                                                    <input type="number" class="form-control shadow border-dark" name="score" id="score"
                                                     min="1" max="10" step="0.01" required>
                                                 </form>
                                                 <?php } ?>
