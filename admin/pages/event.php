@@ -59,7 +59,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                         <button type="button" class="btn btn-success" id="start-event">Start
                                             Event</button>
                                         <?php endif; ?>
-                                        <a href="?page=result-export&event_id=<?= $e->id ?>" class="btn btn-primary" id="result-event">Event
+                                        <a href="?page=result&event_id=<?= $e->id ?>" class="btn btn-primary" id="result-event">Event
                                             Result</a>
                                     </form>
                                 </div>

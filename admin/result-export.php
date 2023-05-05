@@ -1,5 +1,17 @@
 <?php
 
+require('./autoload.php');
+
+date_default_timezone_set('Asia/Manila');
+
+$page = (Input::get('page')) ? Input::get('page') : 'dashboard';
+
+$title = ucwords(str_replace('_', ' ', $page));
+
+$user = new User();
+
+if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
+
 $event_id = Input::get('event_id');
 
 $event = new Event();
@@ -16,10 +28,32 @@ $criterias = $criteria->findBy('event_id', $event_id);
 
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Result - <?= $e->event_name; ?>
+    </title>
+
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../node_modules/toastr/build/toastr.min.css">
+    <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/buttons.dataTables.min.css">
+
+    <link rel="stylesheet" href="./css/admin.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
 <section class="section dashboard">
     <div class="table-responsive">
-
-    <a href="result-export.php?event_id=<?= $event_id; ?>" class="btn btn-primary btn-lg mb-3">Export</a>
 
         <table class="table table-bordered table-hover" id="resultTable" style="width: 100%;">
             <thead>
@@ -103,3 +137,36 @@ $criterias = $criteria->findBy('event_id', $event_id);
         </div>
     </div>
 </div>
+
+<footer class="footer">
+    <div class="copyright">
+        &copy; Copyright <strong><span>
+                <?= Config::get('website/name'); ?> <script>
+                    document.write(new Date().getFullYear());
+                </script>
+            </span></strong>. All Rights Reserved <br>
+    </div>
+    <div class="credits">
+        Designed by <a href="https://fb.com/">Junie</a>
+    </div>
+</footer>
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+</a>
+
+<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../node_modules/toastr/build/toastr.min.js"></script>
+<script src="../node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+<script src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../node_modules/datatables.net/js/dataTables.buttons.min.js"></script>
+<script src="../node_modules/datatables.net/js/buttons.print.min.js"></script>
+<script src="../node_modules/datatables.net/js/buttons.html5.min.js"></script>
+<script src="../node_modules/datatables.net/js/jszip.min.js"></script>
+<script src="../node_modules/datatables.net/js/pdfmake.min.js"></script>
+
+<script src="./js/main.js"></script>
+
+</body>
+</html>
