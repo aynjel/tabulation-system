@@ -7,29 +7,21 @@ $user = new User();
 
 if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
 
+$event_id = Input::get('event_id');
+
 $event = new Event();
 
-$events = $event->all();
-
-$criteria_id = Input::get('criteria_id');
-
-$criteria = new Criteria();
-
-$cri = $criteria->find($criteria_id);
+$e = $event->find($event_id);
 
 $contestant = new Contestant();
 
-$contestants = $contestant->findBy('event_id', $cri->event_id);
+$contestants = $contestant->findBy('event_id', $event_id);
 
-$event = new Event();
+$criteria = new Criteria();
 
-$e = $event->find($cri->event_id);
+$criterias = $criteria->findBy('event_id', $event_id);
 
-$judge = new Judge();
-
-$judges = $judge->findBy('event_id', $cri->event_id);
-
-$title = $e->event_name . ' | ' . $cri->criteria_name;
+$title = "Results"
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +51,7 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
-            <a href="index.html" class="logo d-flex align-items-center">
+            <a href="index.php" class="logo d-flex align-items-center">
                 <span class="d-none d-lg-block">
                     <span class="text-primary">Admin</span> Dashboard
                 </span>
@@ -169,54 +161,57 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
         </div>
 
         <section class="section dashboard">
+
+        <h2 class=""><?=$e->event_name . ' - ' . $e->event_description;?></h2>
+
     <div class="table-responsive">
 
-    <h1 class="text-center text-uppercase"><?= $e->event_name; ?></h1>
-    <h3 class="text-center text-uppercase"><?= $e->event_description; ?></h3>
-    <h4 class="text-center text-uppercase"><?= $cri->criteria_name; ?></h4>
-
-        <table class="table table-bordered table-hover text-center" id="criteria-result-table" style="width: 100%;">
+        <table class="table table-bordered table-hover" id="final-result-table" style="width: 100%;">
             <thead>
-                
                 <tr>
                     <th>No.</th>
                     <th>Baranggay</th>
                     <th>Name</th>
-
-                    <?php foreach($judges as $judge): ?>
-                    <th><?= $judge->judge_name; ?></th>
+                    <?php foreach($criterias as $criteria): ?>
+                    <th><?= $criteria->criteria_name;?></th>
                     <?php endforeach; ?>
-
                     <th>Total</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($contestants as $key => $con): ?>
+                <?php foreach($contestants as $con): ?>
                 <tr>
                     <td><?= $con->contestant_number; ?></td>
                     <td><?= $con->contestant_description; ?></td>
                     <td><?= $con->contestant_name; ?></td>
-                    <?php foreach($judges as $judge): ?>
+                    <?php foreach($criterias as $criteria): ?>
                     <td>
                         <?php
-                        $scr = $contestant->getScoreByJudge($judge->id, $criteria_id, $con->id);
-                        echo $scr;
-                        ?>
+                        $scr = $contestant->getScore($criteria->id, $con->id);
+                        if($scr == 0):?>
+                        <span class="badge bg-danger">-</span>
+                        <?php else: ?>
+                        <button class="btn btn-lg" onclick="ShowScore(<?= $con->id; ?>, <?= $criteria->id; ?>)">
+                            <span class="badge bg-success"><?= $scr; ?></span>
+                        </button>
+                        <?php endif; ?>
                     </td>
                     <?php endforeach; ?>
                     <td>
                         <?php
                         $total = 0;
-                        foreach($judges as $judge){
-                            $total += $contestant->getScoreByJudge($judge->id, $criteria_id, $con->id);
+                        foreach($criterias as $criteria){
+                            $total += $contestant->getScore($criteria->id, $con->id);
                         }
-                        echo $total;
                         ?>
-                    </td>
+                        <button class="btn btn-lg" onclick="ShowTotalScore(<?= $con->id; ?>)">
+                            <span class="badge bg-success"><?= $total; ?></span>
+                        </button>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
             <tfoot>
+                
             </tfoot>
         </table>
     </div>
@@ -224,7 +219,39 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
 
     </main>
 
-    <footer id="footer" class="footer">
+<!-- show score modal -->
+<div class="modal fade" id="showScoreModal" tabindex="-1" aria-labelledby="showScoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="showScoreModalLabel">Score Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div id="showScoreModalBody" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- show total score modal -->
+<div class="modal fade" id="showTotalScoreModal" tabindex="-1" aria-labelledby="showTotalScoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="showTotalScoreModalLabel">Total Score Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div id="showTotalScoreModalBody" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="footer" class="footer">
         <div class="copyright">
             &copy; Copyright <strong><span>
                     <?= Config::get('website/name'); ?> <script>
@@ -253,9 +280,10 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
     <script src="../node_modules/datatables.net/js/pdfmake.min.js"></script>
 
     <script src="./js/main.js"></script>
+
     <script type="text/javascript">
-        $(document).ready(function() {
-            $("#criteria-result-table").DataTable({
+        $(document).ready(function () {
+            $("#final-result-table").DataTable({
                 paging: false,
                 dom: 'Bfrtip',
                 // buttons: [
@@ -264,17 +292,17 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
                 buttons: [
                     {
                         extend: 'print',
-                        title: <?= json_encode($e->event_name . ' - ' . $cri->criteria_name); ?>,
+                        title: <?= json_encode([$e->event_name . ' - ' . $e->event_description . ' Results']); ?>,
                         text: 'Print',
                         exportOptions: {
                             modifier: {
-                                page: 'current',
+                                page: 'current'
                             }
-                        },
+                        }
                     },
                     {
                         extend: 'excel',
-                        title: <?= json_encode($e->event_name . ' - ' . $cri->criteria_name); ?>,
+                        title: 'Criteria Result',
                         text: 'Excel',
                         exportOptions: {
                             modifier: {
@@ -286,5 +314,7 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
             });
         });
     </script>
+
 </body>
+
 </html>

@@ -12,7 +12,6 @@
                                 <table class="table table-hover table-bordered" id="e-events-table">
                                     <thead>
                                         <tr>
-                                            <th scope="col">ID</th>
                                             <th scope="col">Name</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">Date</th>

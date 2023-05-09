@@ -311,8 +311,7 @@ $e = $event->find($j->event_id);
 
                         var criteria = obj.criteria;
 
-                        $("#criteria-label").html(obj.criteria.criteria_name + " (" + obj.criteria
-                            .criteria_percentage + "%)");
+                        $("#criteria-label").html(obj.criteria.criteria_name);
                         
                         $("#criteria-label-modal").html(obj.criteria.criteria_name + " (" + obj.criteria
                             .criteria_percentage + "%)");
@@ -408,6 +407,7 @@ $e = $event->find($j->event_id);
             });
 
             $(document).ready(function () {
+
                 CheckEvent();
                 setInterval(function () {
                     CheckEvent();

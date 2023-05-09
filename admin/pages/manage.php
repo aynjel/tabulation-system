@@ -28,6 +28,10 @@
                                         data-bs-target="#addCriteriaModal">
                                         <i class="fas fa-plus"></i> Add Criteria
                                     </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#addScoreModal">
+                                        <i class="fas fa-plus"></i> Add Score
+                                    </button>
                                 </div>
                             </div>
 
@@ -501,6 +505,47 @@
                                 <label for="create_criteria_percentage">Criteria Percentage</label>
                                 <input type="number" name="create_criteria_percentage" id="create_criteria_percentage"
                                     class="form-control">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Create Criteria</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addScoreModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Add Score</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-add-score" method="POST" action="add-score.php">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="create_contestant_id">Contestant</label>
+                                <select name="create_contestant_id" id="create_contestant_id" class="form-control">
+                                    <option selected disabled hidden value="">Select Contestant</option>
+                                    <?php 
+                                    $contestant = new Contestant();
+                                    $contestants = $contestant->all();
+                                    
+                                    foreach($contestants as $con): ?>
+                                    <option value="<?= $con->id ?>"><?= $con->contestant_name . ' - '.  $con->contestant_description ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create_score_id">Score</label>
+                                <input class="form-control" name="score">
                             </div>
                         </div>
                         <div class="mt-3">
