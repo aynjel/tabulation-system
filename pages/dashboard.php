@@ -87,3 +87,56 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Edit Event</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-event" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_event_name">Event Name</label>
+                                <input type="text" name="edit_event_name" id="edit_event_name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_event_venue">Event Venue</label>
+                                <input type="text" name="edit_event_venue" id="edit_event_venue"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_event_date">Event Date</label>
+                                <input type="date" name="edit_event_date" id="edit_event_date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_event_time">Event Time</label>
+                                <input type="time" name="edit_event_time" id="edit_event_time" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="edit_event_description">Event Description</label>
+                                <textarea name="edit_event_description" id="edit_event_description"
+                                    class="form-control" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <input type="hidden" name="edit_event_id" id="edit_event_id" class="form-control">
+                            <button type="submit" class="btn btn-primary">Edit Event</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

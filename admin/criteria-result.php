@@ -169,58 +169,59 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
         </div>
 
         <section class="section dashboard">
-    <div class="table-responsive">
+            <div class="table-responsive">
 
-    <h1 class="text-center text-uppercase"><?= $e->event_name; ?></h1>
-    <h3 class="text-center text-uppercase"><?= $e->event_description; ?></h3>
-    <h4 class="text-center text-uppercase"><?= $cri->criteria_name; ?></h4>
+                <h1 class="text-center text-uppercase"><?= $e->event_name; ?></h1>
+                <h3 class="text-center text-uppercase"><?= $e->event_description; ?></h3>
+                <h4 class="text-center text-uppercase"><?= $cri->criteria_name; ?></h4>
 
-        <table class="table table-bordered table-hover text-center" id="criteria-result-table" style="width: 100%;">
-            <thead>
-                
-                <tr>
-                    <th>No.</th>
-                    <th>Baranggay</th>
-                    <th>Name</th>
+                <table class="table table-bordered table-hover text-center" id="criteria-result-table"
+                    style="width: 100%;">
+                    <thead>
 
-                    <?php foreach($judges as $judge): ?>
-                    <th><?= $judge->judge_name; ?></th>
-                    <?php endforeach; ?>
+                        <tr>
+                            <th>No.</th>
+                            <th>Baranggay</th>
+                            <th>Name</th>
 
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach($contestants as $key => $con): ?>
-                <tr>
-                    <td><?= $con->contestant_number; ?></td>
-                    <td><?= $con->contestant_description; ?></td>
-                    <td><?= $con->contestant_name; ?></td>
-                    <?php foreach($judges as $judge): ?>
-                    <td>
-                        <?php
+                            <?php foreach($judges as $judge): ?>
+                            <th><?= $judge->judge_name; ?></th>
+                            <?php endforeach; ?>
+
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($contestants as $key => $con): ?>
+                        <tr>
+                            <td><?= $con->contestant_number; ?></td>
+                            <td><?= $con->contestant_description; ?></td>
+                            <td><?= $con->contestant_name; ?></td>
+                            <?php foreach($judges as $judge): ?>
+                            <td>
+                                <?php
                         $scr = $contestant->getScoreByJudge($judge->id, $criteria_id, $con->id);
                         echo $scr;
                         ?>
-                    </td>
-                    <?php endforeach; ?>
-                    <td>
-                        <?php
+                            </td>
+                            <?php endforeach; ?>
+                            <td>
+                                <?php
                         $total = 0;
                         foreach($judges as $judge){
                             $total += $contestant->getScoreByJudge($judge->id, $criteria_id, $con->id);
                         }
                         echo $total;
                         ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-            </tfoot>
-        </table>
-    </div>
-</section>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
 
     </main>
 
@@ -254,18 +255,15 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
 
     <script src="./js/main.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $("#criteria-result-table").DataTable({
                 paging: false,
                 dom: 'Bfrtip',
-                // buttons: [
-                //     'copy', 'csv', 'excel', 'pdf', 'print'
-                // ],
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'print',
-                        title: <?= json_encode($e->event_name . ' - ' . $cri->criteria_name); ?>,
-                        text: 'Print',
+                        title: <?= json_encode($e-> event_name.
+                            ' - '.$cri-> criteria_name); ?>,
+                        text : 'Print',
                         exportOptions: {
                             modifier: {
                                 page: 'current',
@@ -274,8 +272,9 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
                     },
                     {
                         extend: 'excel',
-                        title: <?= json_encode($e->event_name . ' - ' . $cri->criteria_name); ?>,
-                        text: 'Excel',
+                        title: <?= json_encode($e-> event_name.
+                            ' - '.$cri-> criteria_name); ?>,
+                        text : 'Excel',
                         exportOptions: {
                             modifier: {
                                 page: 'current'
@@ -287,4 +286,5 @@ $title = $e->event_name . ' | ' . $cri->criteria_name;
         });
     </script>
 </body>
+
 </html>

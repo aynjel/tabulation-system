@@ -9,7 +9,7 @@ class Contestant extends Model{
 
     // fetch all contestants from the database
     public function fetchContestants(){
-        return $this->all();
+        return $this->all('contestant_number', 'ASC');
     }
 
     // get the score of a contestant based on the criteria

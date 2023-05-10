@@ -38,7 +38,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                 <i class="bi bi-geo-alt"></i>
                                 <?= $e->event_venue ?>
                                 <br>
-                                <?= ($e->is_start == 'true') ? '<span class="badge bg-success">Started</span>' : '<span class="badge bg-danger">Not Started</span>' ?>
+                                <span id="event-status"></span>
                             </p>
 
                             <!-- display current showed criteria -->
@@ -46,25 +46,10 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                 Showed Criteria: <span id="current-showed-criteria"></span>
                             </p>
 
-                            <!-- button group -->
                             <div class="text-center mx-auto">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <form id="start-stop-event-form">
-                                        <input type="hidden" id="event-id" value="<?= $e->id ?>">
-                                        <?php if($e->is_start == 'true'): ?>
-                                        <button type="button" class="btn btn-danger" id="stop-event">Stop Event</button>
-                                        <button type="button" class="btn btn-info text-light" data-bs-toggle="modal"
-                                            data-bs-target="#controlCriteriaModal">Control Criteria</button>
-                                        <?php else: ?>
-                                        <button type="button" class="btn btn-success" id="start-event">Start
-                                            Event</button>
-                                        <?php endif; ?>
-                                        <a href="result.php?&event_id=<?= $e->id ?>" class="btn btn-info text-light"
-                                            target="_blank">
-                                            Overall Result
-                                        </a>
-                                    </form>
-                                </div>
+
+                                <div id="e-event-btn"></div>
+
                             </div>
 
                             <hr class="my-4">
@@ -104,7 +89,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                 </button>
                                             </div>
                                         </div>
-                                        <table class="table table-hover table-bordered" id="e-criterias-table">
+                                        <table class="table table-hover table-bordered text-center" id="e-criterias-table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Name</th>
@@ -132,7 +117,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                 </button>
                                             </div>
                                         </div>
-                                        <table class="table table-hover table-bordered" id="e-contestants-table">
+                                        <table class="table table-hover table-bordered text-center" id="e-contestants-table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Number</th>
@@ -159,7 +144,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                 </button>
                                             </div>
                                         </div>
-                                        <table class="table table-hover table-bordered" id="e-judges-table">
+                                        <table class="table table-hover table-bordered text-center" id="e-judges-table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Name</th>
@@ -304,41 +289,174 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
     </div>
 </div>
 
-<!-- control criteria visible to judges modal -->
-<div class="modal fade" id="controlCriteriaModal" tabindex="-1" aria-labelledby="controlCriteriaModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="editCriteriaModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><strong>Control Criteria Visibility</strong></h5>
+                <h5 class="modal-title"><strong>Edit Criteria</strong></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="form-control-criteria">
-                <div class="modal-body text-center mx-auto">
-                    <?php
-                    $cri = new Criteria(); 
-                    $criterias = $cri->findBy('event_id', $e->id);
-                    ?>
-                    <h1 class="mb-3" id="showed-criteria"></h1>
+            <div class="modal-body">
+                <form id="form-edit-criteria" method="POST">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="control_criteria_id">Criterias</label>
-                                <select name="control_criteria_id" id="control_criteria_id" class="form-control"
-                                    required>
-                                    <option selected disabled hidden value="">Select</option>
-                                    <?php foreach($criterias as $criteria): ?>
-                                    <option value="<?= $criteria->id ?>"><?= $criteria->criteria_name ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label for="edit_criteria_name">Criteria Name</label>
+                                <input type="text" name="edit_criteria_name" id="edit_criteria_name"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_criteria_percentage">Criteria Percentage</label>
+                                <input type="readonly" name="edit_criteria_percentage" id="edit_criteria_percentage"
+                                    class="form-control">
                             </div>
                         </div>
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <input type="hidden" name="edit_criteria_id" id="edit_criteria_id" class="form-control">
+                            <button type="submit" class="btn btn-primary">Edit Criteria</button>
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewCriteriaResultModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Criteria Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+
+                    <div id='e-criterias-result'></div>
+
                 </div>
-            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewContestantResultModal" tabindex="-1" aria-labelledby="addContestantModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Contestant Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+
+                    <div id='e-contestant-result'></div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewJudgeResultModal" tabindex="-1" aria-labelledby="addJudgeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Judge Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+
+                    <div id='e-judge-result'></div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editJudgeModal" tabindex="-1" aria-labelledby="addJudgeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Edit Judge</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-judge" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_judge_name">Judge Name</label>
+                                <input type="text" name="edit_judge_name" id="edit_judge_name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_judge_username">Judge Username</label>
+                                <input type="readonly" name="edit_judge_username" id="edit_judge_username"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_judge_password">Judge Password</label>
+                                <input type="password" name="edit_judge_password" id="edit_judge_password" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <input type="hidden" name="edit_judge_id" id="edit_judge_id" class="form-control">
+                            <button type="submit" class="btn btn-primary">Edit Judge</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editContestantModal" tabindex="-1" aria-labelledby="addContestantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Edit Contestant</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-contestant" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_contestant_name">Contestant Name</label>
+                                <input type="text" name="edit_contestant_name" id="edit_contestant_name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_contestant_number">Contestant Number</label>
+                                <input type="text" name="edit_contestant_number" id="edit_contestant_number"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_contestant_description">Contestant Baranggay</label>
+                                <input type="text" name="edit_contestant_description" id="edit_contestant_description" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <input type="hidden" name="edit_contestant_id" id="edit_contestant_id" class="form-control">
+                            <button type="submit" class="btn btn-primary">Edit Contestant</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

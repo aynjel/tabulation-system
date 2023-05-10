@@ -16,8 +16,8 @@ class Model {
         return $this->db->query("SELECT * FROM {$this->table} WHERE id = ?", [$id])->first();
     }
 
-    public function findBy($field, $value) {
-        return $this->db->query("SELECT * FROM {$this->table} WHERE {$field} = ?", [$value])->results();
+    public function findBy($field, $value, $order = 'id', $sort = 'ASC') {
+        return $this->db->query("SELECT * FROM {$this->table} WHERE {$field} = ? ORDER BY {$order} {$sort}", [$value])->results();
     }
 
     public function findFirst($field, $value) {

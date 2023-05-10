@@ -1,23 +1,3 @@
-<?php
-require('./autoload.php');
-
-date_default_timezone_set('Asia/Manila');
-
-$page = (Input::get('page')) ? Input::get('page') : 'dashboard';
-
-$title = ucwords(str_replace('_', ' ', $page));
-
-$judge = new Judge();
-
-$j = $judge->find(Session::get('judge_id'));
-
-if(!$judge->isLoggedIn() || Input::get('page') == 'logout'){$judge->logout();echo '<script>window.location.href = "./auth/login.php";</script>';}
-
-$event = new Event();
-
-$e = $event->find($j->event_id);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,15 +7,43 @@ $e = $event->find($j->event_id);
     <title>Document</title>
 </head>
 <body>
-    Event: <?= $e->event_name; ?> <input type="readonly" id="event-id" value="<?= $e->id; ?>"> <br>
-    Judge: <?= $j->judge_name; ?> <input type="readonly" id="judge-id" value="<?= $j->id; ?>"> <br>
-    Showed Criteria: <span id="showed-criteria"></span> <input type="readonly" id="showed-criteria-id"> <br>
-
-    <br>
     
-    <div id="contestants"></div>
+    <table border="1" id="example" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th colspan="3">id</th>
+                <th>name</th>
+                <th>number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>John</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>John</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>John</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>John</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>John</td>
+                <td>5</td>
+            </tr>
+        </tbody>
+    </table>
 
-    <script src="./../node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="./index.js"></script>
 </body>
 </html>
