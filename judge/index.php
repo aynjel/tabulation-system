@@ -33,6 +33,7 @@ $e = $event->find($j->event_id);
     <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../node_modules/toastr/build/toastr.min.css">
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
+    
 
     <link rel="stylesheet" href="./css/judge.css">
     <link rel="stylesheet" href="./css/style.css">
@@ -52,12 +53,6 @@ $e = $event->find($j->event_id);
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
-                <li class="nav-item d-block d-lg-none">
-                    <a class="nav-link nav-icon search-bar-toggle " href="#">
-                        <i class="bi bi-search"></i>
-                    </a>
-                </li>
 
                 <li class="nav-item dropdown pe-3">
 
@@ -135,71 +130,6 @@ $e = $event->find($j->event_id);
         </div>
     </footer>
 
-    <div class="modal fade" id="notice-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="scrollableModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-1">
-                                <i class="bi bi-person-check fs-1"></i>
-                            </div>
-                            <div class="col-11">
-                                <h5 class="modal-title fw-bold" id="scrollableModalTitle">
-                                    Hi, <?= $j->judge_name; ?>! Welcome to the Judge Tabulator!
-                                    <br>
-                                    You are now judging the event of <span
-                                        class="text-success"><?= $e->event_name; ?></span>
-                                    <p class="text-muted mb-0 fs-6 fw-normal">
-                                        Please read the following instructions carefully.
-                                    </p>
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="jumbotron container">
-                        <p class="lead fs-6 fw-normal">
-                            <ol>
-                                <li>
-                                    You can only input a score of <strong>1 to 10</strong>. Otherwise it will be
-                                    invalid.
-                                </li>
-                                <li>
-                                    Be careful in inputting the score. Once you submit it, you can't change it anymore.
-                                </li>
-                                <li>
-                                    You can only submit your score once. So be sure that you are satisfied with your
-                                    score.
-                                </li>
-                                <li>
-                                    To submit your score, click the <code>Submit</code> beside the score input box.
-                                    You can also press the <code>Enter</code> key on your keyboard to submit your score.
-                                </li>
-                                <li>
-                                    If your having issues using the system please contact the event organizer. Thank
-                                    you! <i class="bi bi-emoji-smile"></i>
-                                </li>
-                                <li>
-                                    Enjoy! <i class="bi bi-emoji-smile"></i> <i class="bi bi-emoji-smile"></i> <i
-                                        class="bi bi-emoji-smile"></i>
-                                </li>
-                            </ol>
-                        </p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                        <i class="bi bi-check-circle"></i>
-                        I understand
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="loading-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="scrollableModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
@@ -223,25 +153,28 @@ $e = $event->find($j->event_id);
         </div>
     </div>
 
-    <div class="modal fade" id="proceed-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+    <div class="modal fade" id="new-showed-criteria-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="scrollableModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="jumbotron container text-center py-5">
-
-                    <h4 class="text-uppercase" id="criteria-label-modal"></h4>
-
                         <h5 class="modal-title fw-bold" id="scrollableModalTitle">
-                            Successfully submitted your score! Thank you!
+                            New Criteria to be judged!
                         </h5>
                         
                         <br>
                         <br>
 
-                        <button type="button" class="btn btn-success" id="proceed-btn" disabled>
-                            <i class="bi bi-check-circle"></i>
-                            Proceed
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+
+                        <br>
+                        <br>
+
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            OK, Got it!
                         </button>
                     </div>
                 </div>
@@ -260,11 +193,31 @@ $e = $event->find($j->event_id);
 
     <script src="./js/main.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {
-            if (localStorage.getItem('notice') == null) {
-                $('#notice-modal').modal('show');
-                localStorage.setItem('notice', 'true');
+        function Toast(status, message) {
+            Command: toastr[status](message)
+
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
             }
+        }
+            // if (localStorage.getItem('notice') == null) {
+            //     $('#notice-modal').modal('show');
+            //     localStorage.setItem('notice', 'true');
+            // }
 
             var judge_id = <?= $j->id; ?>;
             var event_id = <?= $j->event_id; ?>;
@@ -283,10 +236,9 @@ $e = $event->find($j->event_id);
                     success: function (data) {
                         var obj = JSON.parse(data);
                         
-                        if (obj.status == "started") {
+                        if (obj.status == "success") {
                             $('#loading-modal').modal('hide');
-                            FetchCriteriaData();
-                            FetchContestant();
+                            // CheckShowedCriteria();
                         } else {
                             $('#loading-modal').modal('show');
 
@@ -298,9 +250,9 @@ $e = $event->find($j->event_id);
                 });
             }
 
-            function FetchCriteriaData() {
+            function CheckShowedCriteria() {
                 $.ajax({
-                    url: "./../backend/judge/fetch-criteria-data.php",
+                    url: "./../backend/judge/check-showed-criteria.php",
                     type: "POST",
                     data: {
                         event_id: event_id
@@ -309,40 +261,16 @@ $e = $event->find($j->event_id);
                     success: function (data) {
                         var obj = JSON.parse(data);
 
-                        var criteria = obj.criteria;
-
-                        $("#criteria-label").html(obj.criteria.criteria_name);
-                        
-                        $("#criteria-label-modal").html(obj.criteria.criteria_name + " (" + obj.criteria
-                            .criteria_percentage + "%)");
-
-                        $("#criteria-id").html(obj.criteria.id);
-                        criteria_id = obj.criteria.id;
-
-                        // check if the criteria is already scored
-                        // setInterval(function () {
-                        //     $.ajax({
-                        //         url: "./../backend/judge/check-criteria-scored.php",
-                        //         type: "POST",
-                        //         data: {
-                        //             criteria_id: obj.criteria.id,
-                        //             judge_id: judge_id,
-                        //             event_id: event_id
-                        //         },
-                        //         async: false,
-                        //         success: function (data) {
-                        //             var obj = JSON.parse(data);
-
-                        //             if (obj.status == "scored") {
-                        //                 $("#submit-all-score").attr('disabled', 'disabled');
-                        //                 $("#proceed-btn").removeAttr('disabled');
-                        //             } else {
-                        //                 $("#submit-all-score").removeAttr('disabled');
-                        //                 $("#proceed-btn").attr('disabled', 'disabled');
-                        //             }
-                        //         }
-                        //     });
-                        // }, 1000);
+                        if(obj.status == "success") {
+                            $("#criteria-name").html(obj.criteria.criteria_name);
+                            $("#table-responsive").show();
+                        } else {
+                            setTimeout(function () {
+                                CheckShowedCriteria();
+                            }, 1000);
+                            $("#criteria-name").html("<span class='badge bg-danger'>No Criteria to be judged!</span><br><br><p class='text-muted'>Please wait for the event organizer to add criteria.</p>");
+                            $("#table-responsive").hide();
+                        }
 
                     }
                 });
@@ -376,49 +304,22 @@ $e = $event->find($j->event_id);
             $("#submit-all-score").on('click', function (e) {
                 e.preventDefault();
                 
-                var forms = $(".form-score");
+                $("#submit-all-score").html(
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
+                );
                 
-                for (var i = 0; i < forms.length; i++) {
-                    var form = forms[i];
-                    $.ajax({
-                        url: './../backend/judge/submit_scores.php',
-                        type: 'POST',
-                        data: {
-                            criteria_id: criteria_id,
-                            judge_id: $(form).find('input[name="judge_id"]').val(),
-                            event_id: $(form).find('input[name="event_id"]').val(),
-                            contestant_id: $(form).find('input[name="contestant_id"]').val(),
-                            score: $(form).find('input[name="score"]').val()
-                        },
-                        success: function (data) {
-                            var obj = JSON.parse(data);
-                            if (obj.status == 'success') {
-                                location.reload();
-                                // $("#proceed-modal").modal('show');
-                                $("#submit-all-score").attr('disabled', 'disabled');
-                            }
-                        }
-                    });
-                }
-            });
-
-            $("#proceed-btn").on('click', function () {
-                location.reload();
             });
 
             $(document).ready(function () {
 
                 CheckEvent();
+                CheckShowedCriteria();
                 setInterval(function () {
                     CheckEvent();
-                    FetchCriteriaData();
-                    FetchContestant();    
+                    CheckShowedCriteria();
                 }, 2000);
-                FetchCriteriaData();
-                FetchContestant();
 
             });
-        });
     </script>
 
 </body>

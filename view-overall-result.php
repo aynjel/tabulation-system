@@ -138,7 +138,7 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
                         contestant_result_html += "<h3 class='text-center text-uppercase'>Overall Result - " + data
                             .event.event_description + "</h3>";
 
-                        contestant_result_html += "<table class='table table-bordered border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%;'>";
+                        contestant_result_html += "<table class='table table-bordered border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 14px;'>";
                         contestant_result_html += "<thead>";
                         contestant_result_html += "<tr>";
                         contestant_result_html += "<th class='text-center' rowspan='2'>#</th>";

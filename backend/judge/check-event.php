@@ -10,13 +10,13 @@ $e = $event->find($event_id);
 
 if($e->is_start == 'true'){
     echo json_encode([
-        'status' => 'started',
+        'status' => 'success',
         'message' => 'Event started.',
         'event' => $e
     ]);
 }else{
     echo json_encode([
-        'status' => 'not_started',
+        'status' => 'error',
         'message' => 'Event not started.',
         'event' => $e
     ]);

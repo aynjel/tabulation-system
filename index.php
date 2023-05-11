@@ -5,7 +5,7 @@ date_default_timezone_set('Asia/Manila');
 
 $page = (Input::get('page')) ? Input::get('page') : 'dashboard';
 
-$title = ucwords(str_replace('_', ' ', $page));
+$title = ucwords(str_replace('-', ' ', $page));
 
 $user = new User();
 
@@ -53,12 +53,6 @@ $events = $event->all();
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
-                <li class="nav-item d-block d-lg-none">
-                    <a class="nav-link nav-icon search-bar-toggle " href="#">
-                        <i class="bi bi-search"></i>
-                    </a>
-                </li>
 
                 <li class="nav-item dropdown pe-3">
 
@@ -118,19 +112,19 @@ $events = $event->all();
                 </a>
             </li>
 
-            <li class="nav-heading">Pages</li>
+            <li class="nav-heading">Manage</li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="?page=manage">
-                    <i class="bi bi-layout-text-sidebar"></i>
-                    <span>Manage</span>
+                <a class="nav-link collapsed" href="?page=manage-users">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="?page=events">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>Events</span>
+                <a class="nav-link collapsed" href="?page=manage-judge">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Judge</span>
                 </a>
             </li>
 

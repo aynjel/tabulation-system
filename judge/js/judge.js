@@ -16,16 +16,6 @@ $(document).ready(function () {
                 return;
             }
 
-            // if(username == "judge" && password == "judge"){
-            //     Swal.fire({
-            //         icon: 'success',
-            //         title: 'Login Success',
-            //         text: 'You will be redirected to the dashboard',
-            //     });
-            //     // location.href = "../index.php";
-            //     return;
-            // }
-
             $.ajax({
                 url: "./../../backend/judge/login-handler.php",
                 type: this.method,
@@ -46,6 +36,9 @@ $(document).ready(function () {
                                 Swal.showLoading()
                             },
                             showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false,
                         }).then((result) => {
                             if (result.dismiss === Swal.DismissReason.timer) {
                                 location.href = "./../index.php";
