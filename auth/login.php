@@ -4,8 +4,15 @@ require('./../autoload.php');
 date_default_timezone_set('Asia/Manila');
 
 $user = new User();
+$judge = new Judge();
 
-if($user->isLoggedIn()){header('Location: ./index.php');}
+if($user->isLoggedIn()){
+    header('Location: ./../');
+}
+
+if($judge->isLoggedIn()){
+    header('Location: ./../judge-index.php');
+}
 
 ?>
 
@@ -17,7 +24,7 @@ if($user->isLoggedIn()){header('Location: ./index.php');}
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        Admin Login
+        Login
     </title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/toastr/build/toastr.min.css">
@@ -33,7 +40,7 @@ if($user->isLoggedIn()){header('Location: ./index.php');}
             <div class="card-body">
                 <form id="login-form" class="form-signin" method="POST">
                     <h1 class="h3 mb-3 fw-normal">
-                        Admin Login
+                        Login to your account
                     </h1>
 
                     <div class="alert alert-danger d-none" id="login-alert" role="alert">
@@ -50,6 +57,16 @@ if($user->isLoggedIn()){header('Location: ./index.php');}
                             placeholder="Password">
                         <label for="login-password">Password</label>
                     </div>
+
+                    <div class="input-group mt-3 bg-light">
+                        <div class="input-group-text">
+                            <input class="form-check-input" type="checkbox" name="judge" id="judge" value="true">
+                        </div>
+                        <label class="form-check-label align-self-center ms-2" for="login-remember">
+                            Judge
+                        </label>
+                    </div>
+
                     <button class="w-100 btn btn-lg btn-primary mt-3" type="submit" id="login-btn">
                         Login
                     </button>
@@ -71,6 +88,7 @@ if($user->isLoggedIn()){header('Location: ./index.php');}
 
                 var username = $("#login-username").val();
                 var password = $("#login-password").val();
+                var judge = $("#judge").is(":checked");
 
                 // check if username and password is empty
                 if (username == "" || password == "") {
@@ -82,48 +100,61 @@ if($user->isLoggedIn()){header('Location: ./index.php');}
                     return;
                 }
 
-                // if(username == "admin" && password == "admin"){
-                //     Swal.fire({
-                //         icon: 'success',
-                //         title: 'Login Success',
-                //         text: 'You will be redirected to the dashboard',
-                //     });
-                //     // location.href = "../index.php";
-                //     return;
-                // }
-
                 $.ajax({
                     url: "./../backend/admin/login-handler.php",
                     type: this.method,
                     data: {
                         username: username,
-                        password: password
+                        password: password,
+                        judge: judge
                     },
                     success: function (data) {
                         data = JSON.parse(data);
                         if (data.status == "success") {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Login Success',
-                                text: data.message +
-                                    " You will be redirected to the dashboard",
-                                timer: 3000,
-                                timerProgressBar: true,
-                                onBeforeOpen: () => {
-                                    Swal.showLoading()
-                                },
-                                showConfirmButton: false,
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                allowEnterKey: false,
-                            }).then((result) => {
-                                if (result.dismiss === Swal.DismissReason.timer) {
-                                    location.href = "./../index.php";
-                                }
-                            });
-                        }
+                            var title = "";
+                            if (data.user_type == "admin") {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Login Successful as Administrator',
+                                    text: data.message + ". Redirecting...",
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    onBeforeOpen: () => {
+                                        Swal.showLoading()
+                                    },
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    allowEnterKey: false,
+                                }).then((result) => {
+                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                        location.href = "./../";
+                                    }
+                                });
+                            } else if (data.user_type == "judge") {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Login Successful as Judge',
+                                    text: data.message + ". Redirecting...",
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    onBeforeOpen: () => {
+                                        Swal.showLoading()
+                                    },
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    allowEnterKey: false,
+                                }).then((result) => {
+                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                        location.href = "./../judge-index.php";
+                                    }
+                                });
+                            }
 
-                        if (data.status == "error") {
+                            
+
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Login Failed',

@@ -11,7 +11,7 @@ $judge = new Judge();
 
 $j = $judge->find(Session::get('judge_id'));
 
-if(!$judge->isLoggedIn() || Input::get('page') == 'logout'){$judge->logout();echo '<script>window.location.href = "./auth/login.php";</script>';}
+if(!$judge->isLoggedIn() || Input::get('page') == 'logout'){$judge->logout();echo '<script>window.location.href = "./../auth/login.php";</script>';}
 
 $event = new Event();
 
@@ -33,6 +33,8 @@ $e = $event->find($j->event_id);
     <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../node_modules/toastr/build/toastr.min.css">
     <link rel="stylesheet" href="../node_modules/sweetalert2/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../node_modules/datatables.net/css/buttons.dataTables.min.css">
     
 
     <link rel="stylesheet" href="./css/judge.css">
@@ -153,30 +155,25 @@ $e = $event->find($j->event_id);
         </div>
     </div>
 
-    <div class="modal fade" id="new-showed-criteria-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+    <div class="modal fade" id="score-ranking-modal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="scrollableModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fw-bold" id="criteria-name-score-ranking">
+                    </h2>
+                    <h5 class="modal-title fw-bold" id="scrollableModalTitle">
+                        Score Ranking
+                    </h5>
+                </div>
                 <div class="modal-body">
-                    <div class="jumbotron container text-center py-5">
-                        <h5 class="modal-title fw-bold" id="scrollableModalTitle">
-                            New Criteria to be judged!
-                        </h5>
-                        
-                        <br>
-                        <br>
-
-                        <div class="spinner-border text-danger" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-
-                        <br>
-                        <br>
-
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                            OK, Got it!
-                        </button>
+                    <div class="table-responsive" id="score-ranking-table">
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="score-ranking-modal-close">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -190,8 +187,12 @@ $e = $event->find($j->event_id);
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../node_modules/toastr/build/toastr.min.js"></script>
     <script src="../node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../node_modules/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="../node_modules/datatables.net/js/buttons.print.min.js"></script>
+    <script src="../node_modules/datatables.net/js/buttons.html5.min.js"></script>
+    <script src="../node_modules/datatables.net/js/jszip.min.js"></script>
 
-    <script src="./js/main.js"></script>
     <script type="text/javascript">
         function Toast(status, message) {
             Command: toastr[status](message)
@@ -214,10 +215,6 @@ $e = $event->find($j->event_id);
                 "hideMethod": "fadeOut"
             }
         }
-            // if (localStorage.getItem('notice') == null) {
-            //     $('#notice-modal').modal('show');
-            //     localStorage.setItem('notice', 'true');
-            // }
 
             var judge_id = <?= $j->id; ?>;
             var event_id = <?= $j->event_id; ?>;
@@ -238,7 +235,6 @@ $e = $event->find($j->event_id);
                         
                         if (obj.status == "success") {
                             $('#loading-modal').modal('hide');
-                            // CheckShowedCriteria();
                         } else {
                             $('#loading-modal').modal('show');
 
@@ -263,11 +259,15 @@ $e = $event->find($j->event_id);
 
                         if(obj.status == "success") {
                             $("#criteria-name").html(obj.criteria.criteria_name);
+                            $("#criteria-name-score-ranking").html(obj.criteria.criteria_name);
                             $("#table-responsive").show();
+
+                            // check if previous criteria is the same as the current criteria
+                            if(criteria_id != obj.criteria.id) {
+                                criteria_id = obj.criteria.id;
+                                FetchContestantData();
+                            }
                         } else {
-                            setTimeout(function () {
-                                CheckShowedCriteria();
-                            }, 1000);
                             $("#criteria-name").html("<span class='badge bg-danger'>No Criteria to be judged!</span><br><br><p class='text-muted'>Please wait for the event organizer to add criteria.</p>");
                             $("#table-responsive").hide();
                         }
@@ -275,49 +275,125 @@ $e = $event->find($j->event_id);
                     }
                 });
             }
-
-
-            $(".form-score").on('keyup', function () {
-                var input_boxes = $(this).find('input[type="number"]');
-                var is_filled = true;
-                var is_valid = true;
-                
-                $.each(input_boxes, function (index, input_box) {
-                    if ($(input_box).val() == '' || $(input_box).val() == null) {
-                        is_filled = false;
-                    }
-
-                    var value = $(input_box).val();
-                    if (value < 1 || value > 10) {
-                        is_valid = false;
-                        $(input_box).val(null);
+            
+            function FetchContestantData(){
+                $.ajax({
+                    url: "./../backend/judge/fetch-contestant-data.php",
+                    type: "POST",
+                    data: {
+                        event_id: event_id,
+                    },
+                    async: false,
+                    success: function (data) {
+                        $("#j-contestants-table tbody").html(data);
+                    },
+                    error: function (err) {
+                        console.log(err);
                     }
                 });
+            }
 
-                if (is_filled && is_valid) {
-                    $("#submit-all-score").removeAttr('disabled');
-                } else {
-                    $("#submit-all-score").attr('disabled', 'disabled');
-                }
-            });
-
-            $("#submit-all-score").on('click', function (e) {
-                e.preventDefault();
-                
-                $("#submit-all-score").html(
-                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
-                );
-                
-            });
+            function JudgeScoreRanking(){
+                $.ajax({
+                    url: "./../backend/judge/judge-score-ranking.php",
+                    type: "POST",
+                    data: {
+                        event_id: event_id,
+                        criteria_id: criteria_id,
+                    },
+                    async: false,
+                    success: function (data) {
+                        $("#score-ranking-table").html(data);
+                        $("#judge-score-ranking-table").DataTable({
+                            'paging': false,
+                            'searching': false,
+                            'info': false
+                        });
+                        // $(".form-score").hide();
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
 
             $(document).ready(function () {
 
                 CheckEvent();
                 CheckShowedCriteria();
+                FetchContestantData();
+                JudgeScoreRanking();
+                
                 setInterval(function () {
                     CheckEvent();
                     CheckShowedCriteria();
                 }, 2000);
+
+                $(".form-score").on('keyup', function () {
+                    var input_boxes = $(this).find('input[type="number"]');
+                    var is_filled = true;
+                    var is_valid = true;
+                    
+                    $.each(input_boxes, function (index, input_box) {
+                        if ($(input_box).val() == '' || $(input_box).val() == null) {
+                            is_filled = false;
+                        }
+
+                        var value = $(input_box).val();
+                        if (value < 1 || value > 10) {
+                            is_valid = false;
+                            $(input_box).val(null);
+                        }
+                    });
+
+                    if (is_filled && is_valid) {
+                        $("#submit-all-score").removeAttr('disabled');
+                    } else {
+                        $("#submit-all-score").attr('disabled', 'disabled');
+                    }
+                });
+
+                $("#submit-all-score").on('click', function (e) {
+                    e.preventDefault();
+
+                    $("#submit-all-score").html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
+                    );
+                    
+                    var forms = $(".form-score");
+                    
+                    for (var i = 0; i < forms.length; i++) {
+                        var form = forms[i];
+                        $.ajax({
+                            url: './../backend/judge/submit_scores.php',
+                            type: 'POST',
+                            data: {
+                                criteria_id: criteria_id,
+                                judge_id: $(form).find('input[name="judge_id"]').val(),
+                                event_id: $(form).find('input[name="event_id"]').val(),
+                                contestant_id: $(form).find('input[name="contestant_id"]').val(),
+                                score: $(form).find('input[name="score"]').val()
+                            },
+                            success: function (data) {
+                                var obj = JSON.parse(data);
+                                if (obj.status == 'success') {
+                                    
+                                    setTimeout(function () {
+                                        $("#submit-all-score").html('Submit');
+                                        $("#score-ranking-modal").modal('show');
+
+                                        JudgeScoreRanking();
+
+                                        $('#score-ranking-modal').on('hidden.bs.modal', function () {
+                                            location.reload();
+                                        });
+                                    }, 3000);
+                                    
+                                }
+                            }
+                        });
+                    }
+                });
 
             });
     </script>

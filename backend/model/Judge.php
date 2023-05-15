@@ -15,7 +15,7 @@ class Judge extends Model{
     // login judge
     public function login($username, $password){
         $judge = $this->findBy('judge_username', $username);
-        if($judge[0]){
+        if($judge){
             if($judge[0]->judge_password === $password){
                 Session::put('judge_id', $judge[0]->id);
                 return true;
@@ -47,5 +47,15 @@ class Judge extends Model{
     public function getJudgeEventId(){
         $judge = $this->find($this->getJudgeId());
         return $judge->event_id;
+    }
+
+    public function getUserName(){
+        $judge = $this->find($this->getJudgeId());
+        return $judge->judge_username;
+    }
+
+    public function getFullName(){
+        $judge = $this->find($this->getJudgeId());
+        return $judge->judge_name;
     }
 }

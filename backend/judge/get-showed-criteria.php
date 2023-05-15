@@ -2,17 +2,14 @@
 
 require('./autoload.php');
 
-$event_id = Input::get('event_id');
 
-$event = new Event();
-
-// check show criteria
 try{
-    $e = $event->find($event_id);
+
+    $judge = new Judge();
 
     $criteria = new Criteria();
 
-    $cri = $criteria->findBy('event_id', $e->id);
+    $cri = $criteria->findBy('event_id', $judge->getEventId());
 
     $cr = 0;
 
@@ -26,23 +23,20 @@ try{
         echo json_encode([
             'status' => 'success',
             'message' => 'Criteria showed.',
-            'event' => $e,
-            'criteria' => $criteria->find($cr)
+            'data' => [
+                'criteria_id' => $cr,
+            ]
         ], JSON_PRETTY_PRINT);
     }else{
         echo json_encode([
             'status' => 'error',
-            'message' => 'Criteria not showed.',
-            'event' => $e,
-            'criteria' => null
+            'message' => 'No criteria showed in this event.',
         ], JSON_PRETTY_PRINT);
     }
 }catch(Exception $e){
     echo json_encode([
         'status' => 'error',
-        'message' => 'Event not found.',
-        'event' => null,
-        'criteria' => null
+        'message' => $e->getMessage()
     ], JSON_PRETTY_PRINT);
 }
 

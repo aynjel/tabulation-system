@@ -7,13 +7,6 @@ $page = (Input::get('page')) ? Input::get('page') : 'dashboard';
 
 $title = ucwords(str_replace('-', ' ', $page));
 
-$user = new User();
-
-if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
-
-$event = new Event();
-
-$events = $event->all();
 ?>
 
 <!DOCTYPE html>
@@ -24,7 +17,7 @@ $events = $event->all();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        <?= $title; ?> | Admin
+        <?= $title; ?> - Admin
     </title>
 
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -58,36 +51,21 @@ $events = $event->all();
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle"></i>
-                        <span class="d-none d-md-block dropdown-toggle ps-2">
-                            <?= $user->getFullName(); ?>
-                        </span>
+                        <span class="d-none d-md-block dropdown-toggle ps-2 full-name"></span>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-                            <h6>
-                                <?= $user->getFullName(); ?>
-                            </h6>
-                            <span>
-                                Admin Role
-                            </span>
+                            <h6 class="mb-0 full-name"></h6>
+                            <span class="text-muted user-role"></span>
                         </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
 
-                        <!-- <li>
-                            <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                                <i class="bi bi-gear"></i>
-                                <span>Account Settings</span>
-                            </a>
-                        </li>
                         <li>
-                            <hr class="dropdown-divider">
-                        </li> -->
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="?page=logout">
+                            <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" onclick="SignOut()">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sign Out</span>
                             </a>
@@ -112,7 +90,7 @@ $events = $event->all();
                 </a>
             </li>
 
-            <li class="nav-heading">Manage</li>
+            <!-- <li class="nav-heading">Manage</li>
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="?page=manage-users">
@@ -126,7 +104,7 @@ $events = $event->all();
                     <i class="bi bi-person-badge"></i>
                     <span>Judge</span>
                 </a>
-            </li>
+            </li> -->
 
         </ul>
 
@@ -184,9 +162,8 @@ $events = $event->all();
     <script src="./node_modules/datatables.net/js/buttons.print.min.js"></script>
     <script src="./node_modules/datatables.net/js/buttons.html5.min.js"></script>
     <script src="./node_modules/datatables.net/js/jszip.min.js"></script>
-    <script src="./node_modules/datatables.net/js/pdfmake.min.js"></script>
+    <!-- <script src="./node_modules/datatables.net/js/pdfmake.min.js"></script> -->
 
-    <script src="./js/main.js"></script>
     <script type="text/javascript">
         var event_id = 0;
         var criteria_id = 0;
@@ -211,6 +188,122 @@ $events = $event->all();
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
             }
+        }
+
+        function SignOut() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to sign out?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, sign out!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "./backend/admin/sign-out.php",
+                        type: "POST",
+                        success: function (data) {
+                            data = JSON.parse(data);
+
+                            if (data.status == "success") {
+                                Swal.fire({
+                                    title: 'Signing out...',
+                                    text: 'Please wait...',
+                                    allowOutsideClick: false,
+                                    timer: 2000,
+                                    onBeforeOpen: () => {
+                                        Swal.showLoading()
+                                    },
+                                    timerProgressBar: true,
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    allowEnterKey: false,
+                                }).then((result) => {
+                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                        window.location.href = "./auth/login.php";
+                                    }
+                                })
+                            } else {
+                                Toast("error", "Something went wrong!");
+                            }
+                        }
+                    });
+                }
+            })
+        }
+
+        function CheckUser() {
+            $.ajax({
+                url: "./backend/admin/check-user.php",
+                type: "POST",
+                success: function (data) {
+                    var obj = JSON.parse(data);
+
+                    if (obj.status == "success") {
+
+                        if(obj.data.user_type == "admin"){
+                            $(".full-name").html(obj.data.full_name);
+                            $(".user-role").html(obj.data.user_type);
+                        }else{
+                            window.location.href = "./auth/login.php";
+                        }
+
+                        var events = obj.events;
+
+                        var event_html = "";
+
+                        for (var i = 0; i < events.length; i++) {
+                            event_html += "<tr>";
+                            event_html += "<td>" + events[i].id + "</td>";
+                            event_html += "<td>" + events[i].event_name + "</td>";
+                            event_html += "<td>" + events[i].event_date + "</td>";
+                            event_html += "<td>" + events[i].event_time + "</td>";
+                            event_html += "<td>" + events[i].event_venue + "</td>";
+                            event_html += "<td>" + events[i].event_description + "</td>";
+                            event_html += "<td>" + (events[i].is_start == 'true' ?
+                                '<span class="badge bg-success">Started</span>' :
+                                '<span class="badge bg-danger">Not Started</span>') + "</td>";
+                            event_html +=
+                                "<td><div class='btn-group'><button class='btn btn-sm btn-primary' onclick='EditEvent(" +
+                                events[i].id +
+                                ")'><i class='bi bi-pencil-square'></i></button><button class='btn btn-sm btn-danger' onclick='DeleteEvent(" +
+                                events[i].id + ")'><i class='bi bi-trash'></i></button></div></td>";
+                            event_html += "</tr>";
+
+                            event_id = events[i].id;
+                        }
+                        $("#events-table tbody").html(event_html);
+                        $("#e-events-count").html(events.length);
+
+                        var e_event_html = "";
+                        for (var i = 0; i < events.length; i++) {
+                            e_event_html += "<tr>";
+                            e_event_html += "<td>" + events[i].event_name + "</td>";
+                            e_event_html += "<td>" + events[i].event_description + "</td>";
+                            e_event_html += "<td>" + events[i].event_date + "</td>";
+                            e_event_html += "<td>" + events[i].event_time + "</td>";
+                            e_event_html += "<td>" + events[i].event_venue + "</td>";
+                            e_event_html += "<td>" + (events[i].is_start == 'true' ?
+                                '<span class="badge bg-success">Started</span>' :
+                                '<span class="badge bg-danger">Not Started</span>') + "</td>";
+                            e_event_html +=
+                                "<td><div class='btn-group'><a class='btn btn-sm btn-secondary' target='_blank' href='?page=event&event_id=" +
+                                events[i].id +
+                                "'><i class='bi bi-eye'></i></a><button class='btn btn-sm btn-info text-white' onclick='EditEvent(" +
+                                events[i].id +
+                                ")'><i class='bi bi-pencil-square'></i></button><button class='btn btn-sm btn-danger' onclick='DeleteEvent(" +
+                                events[i].id + ")'><i class='bi bi-trash'></i></button></div></td>";
+                            e_event_html += "</tr>";
+                        }
+                        $("#e-events-table tbody").html(e_event_html);
+                    } else {
+                        window.location.href = "./auth/login.php";
+                    }
+                }
+            });
         }
 
         function FetchEventData(id) {
@@ -275,7 +368,7 @@ $events = $event->all();
                         criteria_html += "</td>";
 
                         criteria_html +=
-                            "<td><div class='btn-group' role='group'><button class='btn btn-sm btn-primary' onclick='ViewCriteriaResult(" +
+                            "<td><div class='btn-group' role='group'><button class='btn btn-sm btn-primary' id='view-criteria-results-btn' onclick='ViewCriteriaResult(" +
                             criteria[i].id +
                             ")'>Result</button><button class='btn btn-sm btn-danger' onclick='DeleteCriteria(" +
                             criteria[i].id +
@@ -375,6 +468,14 @@ $events = $event->all();
         }
 
         function ViewCriteriaResult(criteria_id) {
+            Swal.fire({
+                title: 'Tallying result...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+            });
             $.ajax({
                 url: "./backend/admin/view-criteria-result.php",
                 type: "POST",
@@ -383,76 +484,26 @@ $events = $event->all();
                 },
                 success: function (data) {
                     data = JSON.parse(data);
-                    if (data.status == 'success') {
-
-                        var criteria_result_html = "";
-
-                        criteria_result_html += "<h1 class='text-center text-uppercase'>" + data
-                            .event.event_name + "</h1>";
-                        criteria_result_html += "<h3 class='text-center text-uppercase'>" + data.event.event_description + " - " + data.criteria.criteria_name + "</h3>";
-
-                        criteria_result_html += "<table class='table table-bordered border-dark text-center align-middle'>";
-                        criteria_result_html += "<thead>";
-                        criteria_result_html += "<tr>";
-                        criteria_result_html += "<th>Number</th>";
-                        criteria_result_html += "<th>Baranggay</th>";
-                        criteria_result_html += "<th>Name</th>";
-
-                        for (var i = 0; i < data.judges.length; i++) {
-                            criteria_result_html += "<th>" + data.judges[i].judge_name + "</th>";
-                        }
-
-                        criteria_result_html += "<th>Total</th>";
-                        criteria_result_html += "<th>Ranking</th>";
-                        criteria_result_html += "</tr>";
-                        criteria_result_html += "</thead>";
-                        criteria_result_html += "<tbody>";
-
-                        for (var i = 0; i < data.contestants.length; i++) {
-                            criteria_result_html += "<tr>";
-                            criteria_result_html += "<td>" + data.contestants[i].contestant_number +
-                            "</td>";
-                            criteria_result_html += "<td>" + data.contestants[i].contestant_description +
-                                "</td>";
-                            criteria_result_html += "<td>" + data.contestants[i].contestant_name + "</td>";
-
-                            for (var j = 0; j < data.judges.length; j++) {
-                                setInterval(
-                                    GetJudgeScore(data.judges[j].judge_id, criteria_id, data
-                                        .contestants[i].contestant_id),
-                                    1000
-                                );
-
-                                criteria_result_html +=
-                                "<td><span id='score-criteria-result'>0</span></td>";
-
-                            }
-
-
-                            criteria_result_html +=
-                                "<td><span id='total-score-criteria-result'>0</span></td>";
-                            criteria_result_html += "<td>" + 0 + "</td>";
-                            criteria_result_html += "</tr>";
-                        }
-
-                        criteria_result_html += "</tbody>";
-                        criteria_result_html += "</table>";
-                        // do not show print button in print preview
-                        criteria_result_html += "<div class='text-right' id='print-btn-criteria'>";
-                        criteria_result_html +=
-                            "<button type='button' class='btn btn-sm btn-primary' onclick='PrintCriteriaResult()'><i class='fa fa-print'></i> Print Result</button>";
-                        criteria_result_html += "</div>";
-
-                        $("#e-criterias-result").html(criteria_result_html);
-
-                    } else {
+                    if (data.status == 'error') {
                         Toast(data.status, data.message);
+                    } else {
+                        $("#e-criterias-result").html(data.html);
+                        $("#criteria-result-table").DataTable({
+                            "paging": false,
+                            "info": false,
+                            "searching": false,
+                            "responsive": true,
+                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                            "language": {
+                                "emptyTable": "No contestant found"
+                            }
+                        });
+                        $("#viewCriteriaResultModal").modal('show');
+                        Swal.close();
                     }
+
                 }
             });
-
-            $("#viewCriteriaResultModal").modal('show');
-
         }
 
         function PrintCriteriaResult(){
@@ -470,6 +521,14 @@ $events = $event->all();
         }
 
         function ViewContestantResult(contestant_id) {
+            Swal.fire({
+                title: 'Tallying result...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+            });
             $.ajax({
                 url: "./backend/admin/view-contestant-result.php",
                 type: "POST",
@@ -478,80 +537,33 @@ $events = $event->all();
                 },
                 success: function (data) {
                     data = JSON.parse(data);
-                    if (data.status == 'success') {
-                        $("#viewContestantResultModal").modal('show');
-                        
-                        var contestant_result_html = "";
-
-                        contestant_result_html += "<h1 class='text-center text-uppercase'>" + data
-                            .event.event_name + "</h1>";
-                        contestant_result_html += "<h3 class='text-center text-uppercase'>" + data.event.event_description + " - " + data.contestant.contestant_name + "</h3>";
-
-                        contestant_result_html += "<table class='table table-bordered border-dark text-center align-middle'>";
-                        contestant_result_html += "<thead>";
-                        contestant_result_html += "<tr>";
-                        contestant_result_html += "<th>Criteria</th>";
-
-                        for (var i = 0; i < data.judges.length; i++) {
-                            contestant_result_html += "<th>" + data.judges[i].judge_name + "</th>";
-                        }
-
-                        contestant_result_html += "<th>Total</th>";
-                        contestant_result_html += "</tr>";
-                        contestant_result_html += "</thead>";
-                        contestant_result_html += "<tbody>";
-
-                        for (var i = 0; i < data.criteria.length; i++) {
-                            contestant_result_html += "<tr>";
-                            contestant_result_html += "<td>" + data.criteria[i].criteria_name +
-                                "</td>";
-                                
-                            for (var j = 0; j < data.judges.length; j++) {
-                                setInterval(
-                                    GetJudgeScore(data.judges[j].judge_id, data.criteria[i].criteria_id, contestant_id),
-                                    1000
-                                );
-
-                                contestant_result_html +=
-                                "<td><span id='score-contestant-result'>0</span></td>";
-
-                            }
-
-                            // total score
-                            contestant_result_html +=
-                                "<td><span id='total-score-contestant-result'>0</span></td>";
-                            contestant_result_html += "</tr>";
-                        }
-
-                        contestant_result_html += "</tbody>";
-                        contestant_result_html += "</tfoot>";
-                        contestant_result_html += "<tr>";
-                        contestant_result_html += "<th>Total</th>";
-                        for (var i = 0; i < data.judges.length; i++) {
-                            contestant_result_html += "<th><span id='total-score-contestant-result'>0</span></th>";
-                        }
-                        contestant_result_html += "<th><span id='total-score-contestant-result'>0</span></th>";
-                        contestant_result_html += "</tr>";
-                        contestant_result_html += "</tfoot>";
-
-                        contestant_result_html += "</table>";
-                        // do not show print button in print preview
-                        contestant_result_html += "<div class='text-right' id='print-btn-contestant'>";
-                        contestant_result_html +=
-                            "<button type='button' class='btn btn-sm btn-primary' onclick='PrintContestantResult()'><i class='fa fa-print'></i> Print Result</button>";
-                        contestant_result_html += "</div>";
-
-                        $("#e-contestant-result").html(contestant_result_html);
-
-                    } else {
+                    if (data.status == 'error') {
                         Toast(data.status, data.message);
+                    } else {
+                        $("#e-contestants-result").html(data.html);
+                        $("#contestant-result-table").DataTable({
+                            "paging": false,
+                            "info": false,
+                            "searching": false,
+                            "responsive": true,
+                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                            "language": {
+                                "emptyTable": "No contestant found"
+                            }
+                        });
+                        $("#viewContestantResultModal").modal('show');
+                        Swal.close();
                     }
+                },
+                error: function (data) {
+                    console.log(data);
+                    Swal.close();
                 }
             });
         }
 
         function PrintContestantResult(){
-            var printContents = document.getElementById("e-contestant-result").innerHTML;
+            var printContents = document.getElementById("e-contestants-result").innerHTML;
             var originalContents = document.body.innerHTML;
 
             document.body.innerHTML = printContents;
@@ -565,6 +577,14 @@ $events = $event->all();
         }
 
         function ViewJudgeResult(judge_id) {
+            Swal.fire({
+                title: 'Tallying result...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+            });
             $.ajax({
                 url: "./backend/admin/view-judge-result.php",
                 type: "POST",
@@ -573,71 +593,33 @@ $events = $event->all();
                 },
                 success: function (data) {
                     data = JSON.parse(data);
-                    if (data.status == 'success') {
-                        $("#viewJudgeResultModal").modal('show');
-                        
-                        var judge_result_html = "";
-
-                        judge_result_html += "<h1 class='text-center text-uppercase'>" + data
-                            .event.event_name + "</h1>";
-                        judge_result_html += "<h3 class='text-center text-uppercase'>" + data.event.event_description + " - " + data.judge.judge_name + "</h3>";
-
-                        judge_result_html += "<table class='table table-bordered border-dark text-center align-middle'>";
-                        judge_result_html += "<thead>";
-                        judge_result_html += "<tr>";
-                        judge_result_html += "<th>Contestant</th>";
-
-                        for (var i = 0; i < data.criteria.length; i++) {
-                            judge_result_html += "<th>" + data.criteria[i].criteria_name + "</th>";
-                        }
-
-                        judge_result_html += "<th>Total</th>";
-                        judge_result_html += "</tr>";
-                        judge_result_html += "</thead>";
-                        judge_result_html += "<tbody>";
-
-                        for (var i = 0; i < data.contestants.length; i++) {
-                            judge_result_html += "<tr>";
-                            judge_result_html += "<td>" + data.contestants[i].contestant_name +
-                                "</td>";
-                                
-                            for (var j = 0; j < data.criteria.length; j++) {
-                                setInterval(
-                                    GetJudgeScore(data.contestants[i].contestant_id, data.criteria[j].criteria_id, judge_id),
-                                    1000
-                                );
-
-                                judge_result_html +=
-                                "<td><span id='score-judge-result'>0</span></td>";
-
-                            }
-
-                            // total score
-                            judge_result_html +=
-                                "<td><span id='total-score-judge-result'>0</span></td>";
-                            judge_result_html += "</tr>";
-                        }
-
-                        judge_result_html += "</tbody>";
-
-                        judge_result_html += "</table>";
-                        // do not show print button in print preview
-                        judge_result_html += "<div class='text-right' id='print-btn-judge'>";
-                        judge_result_html +=
-                            "<button type='button' class='btn btn-sm btn-primary' onclick='PrintJudgeResult()'><i class='fa fa-print'></i> Print Result</button>";
-                        judge_result_html += "</div>";
-
-                        $("#e-judge-result").html(judge_result_html);
-
-                    } else {
+                    if (data.status == 'error') {
                         Toast(data.status, data.message);
+                    } else {
+                        $("#e-judges-result").html(data.html);
+                        $("#judge-result-table").DataTable({
+                            "paging": false,
+                            "info": false,
+                            "searching": false,
+                            "responsive": true,
+                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                            "language": {
+                                "emptyTable": "No contestant found"
+                            }
+                        });
+                        $("#viewJudgeResultModal").modal('show');
+                        Swal.close();
                     }
+                },
+                error: function (data) {
+                    console.log(data);
+                    Swal.close();
                 }
             });
         }
 
         function PrintJudgeResult(){
-            var printContents = document.getElementById("e-judge-result").innerHTML;
+            var printContents = document.getElementById("e-judges-result").innerHTML;
             var originalContents = document.body.innerHTML;
 
             document.body.innerHTML = printContents;
@@ -696,53 +678,6 @@ $events = $event->all();
                 type: "GET",
                 success: function (data) {
                     data = JSON.parse(data);
-
-                    var events = data.events;
-                    var event_html = "";
-                    for (var i = 0; i < events.length; i++) {
-                        event_html += "<tr>";
-                        event_html += "<td>" + events[i].id + "</td>";
-                        event_html += "<td>" + events[i].event_name + "</td>";
-                        event_html += "<td>" + events[i].event_date + "</td>";
-                        event_html += "<td>" + events[i].event_time + "</td>";
-                        event_html += "<td>" + events[i].event_venue + "</td>";
-                        event_html += "<td>" + events[i].event_description + "</td>";
-                        event_html += "<td>" + (events[i].is_start == 'true' ?
-                            '<span class="badge bg-success">Started</span>' :
-                            '<span class="badge bg-danger">Not Started</span>') + "</td>";
-                        event_html +=
-                            "<td><div class='btn-group'><button class='btn btn-sm btn-primary' onclick='EditEvent(" +
-                            events[i].id +
-                            ")'><i class='bi bi-pencil-square'></i></button><button class='btn btn-sm btn-danger' onclick='DeleteEvent(" +
-                            events[i].id + ")'><i class='bi bi-trash'></i></button></div></td>";
-                        event_html += "</tr>";
-
-                        event_id = events[i].id;
-                    }
-                    $("#events-table tbody").html(event_html);
-                    $("#e-events-count").html(events.length);
-
-                    var e_event_html = "";
-                    for (var i = 0; i < events.length; i++) {
-                        e_event_html += "<tr>";
-                        e_event_html += "<td>" + events[i].event_name + "</td>";
-                        e_event_html += "<td>" + events[i].event_description + "</td>";
-                        e_event_html += "<td>" + events[i].event_date + "</td>";
-                        e_event_html += "<td>" + events[i].event_time + "</td>";
-                        e_event_html += "<td>" + events[i].event_venue + "</td>";
-                        e_event_html += "<td>" + (events[i].is_start == 'true' ?
-                            '<span class="badge bg-success">Started</span>' :
-                            '<span class="badge bg-danger">Not Started</span>') + "</td>";
-                        e_event_html +=
-                            "<td><div class='btn-group'><a class='btn btn-sm btn-secondary' target='_blank' href='?page=event&event_id=" +
-                            events[i].id +
-                            "'><i class='bi bi-eye'></i></a><button class='btn btn-sm btn-info text-white' onclick='EditEvent(" +
-                            events[i].id +
-                            ")'><i class='bi bi-pencil-square'></i></button><button class='btn btn-sm btn-danger' onclick='DeleteEvent(" +
-                            events[i].id + ")'><i class='bi bi-trash'></i></button></div></td>";
-                        e_event_html += "</tr>";
-                    }
-                    $("#e-events-table tbody").html(e_event_html);
 
                     var contestant = data.contestants;
                     var contestant_html = "";
@@ -1015,7 +950,7 @@ $events = $event->all();
                             var obj = JSON.parse(data);
                             if (obj.status == "success") {
                                 Toast(obj.status, obj.message);
-                                FetchData();
+                                CheckUser();
                             } else {
                                 Toast(obj.status, obj.message);
                             }
@@ -1138,14 +1073,14 @@ $events = $event->all();
 
         $(document).ready(function () {
 
-            FetchEventData( <?= Input::get('event_id') ?> );
-            FetchData();
-            CurrentShowedCriteria();
+            CheckUser();
+            
+            var total_scores = $(".criteria-total-score").length;
 
-            // setInterval(function () {
-            //     FetchEventData( <?= Input::get('event_id') ?> );
-            //     CurrentShowedCriteria();
-            // }, 1000);
+            if (window.location.href.indexOf("page=event") > -1) {
+                FetchEventData( <?= Input::get('event_id') ?> );
+                CurrentShowedCriteria( <?= Input::get('event_id') ?> );
+            }
 
             //add
             $("#form-add-event").on("submit", function (e) {
@@ -1160,7 +1095,7 @@ $events = $event->all();
 
                         if (obj.status == 'success') {
                             $("#form-add-event")[0].reset();
-                            FetchData();
+                            CheckUser();
                             Toast(obj.status, obj.message);
                         } else {
                             Toast(obj.status, obj.message);
@@ -1264,7 +1199,7 @@ $events = $event->all();
                         if (obj.status == 'success') {
                             $("#form-edit-event")[0].reset();
                             $("#editEventModal").modal("hide");
-                            FetchData();
+                            CheckUser();
                             Toast(obj.status, obj.message);
                         } else {
                             Toast(obj.status, obj.message);

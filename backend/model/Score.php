@@ -7,20 +7,49 @@ class Score extends Model{
         parent::__construct($this->table);
     }
 
-    public function GetContestantScore($event_id, $contestant_id){
+    public function GetContestantScore($event_id, $contestant_id, $criteria_id, $judge_id){
         $scores = $this->findBy('event_id', $event_id);
 
-        // check if this contestant has a score in this criteria and judge
-        $judge = new Judge();
-
-        // get criteria where is_show = true
-        $cri = new Criteria();
-        $criteria = $cri->findBy('is_show', 'true')[0];
-
         foreach($scores as $s){
-            if($s->contestant_id == $contestant_id && $s->criteria_id == $criteria->id && $s->judge_id == $judge->getJudgeId()){
-                return $s;
+            if($s->judge_id == $judge_id){
+                if($s->contestant_id == $contestant_id){
+                    if($s->criteria_id == $criteria_id){
+                        return $s->score;
+                    }
+                }
             }
         }
+    }
+
+    function tabulateScores(array $scores): array
+    {
+        // Group scores by value
+        $scoreGroups = array_reduce($scores, function ($groups, $score) {
+            if (!isset($groups[$score])) {
+                $groups[$score] = ['count' => 0, 'rank' => null];
+            }
+            $groups[$score]['count']++;
+            return $groups;
+        }, []);
+
+        // Assign ranks to groups
+        $rank = 1;
+        foreach ($scoreGroups as &$group) {
+            if ($group['rank'] !== null) {
+                // If the rank is already assigned, move to next rank
+                $rank++;
+            }
+            $group['rank'] = $rank;
+            $rank += $group['count'] - 1;
+        }
+
+        // Convert groups to tabulated scores
+        return array_map(function ($score) use ($scoreGroups) {
+            return [
+                'score' => $score,
+                'count' => $scoreGroups[$score]['count'],
+                'rank' => $scoreGroups[$score]['rank'] + ($scoreGroups[$score]['count'] - 1) / 2
+            ];
+        }, array_keys($scoreGroups));
     }
 }

@@ -171,6 +171,53 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
     </div>
 </section>
 
+<div class="modal fade" id="viewCriteriaResultModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Criteria Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id='e-criterias-result'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewContestantResultModal" tabindex="-1" aria-labelledby="addContestantModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Contestant Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id='e-contestants-result'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewJudgeResultModal" tabindex="-1" aria-labelledby="addJudgeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>View Judge Result</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id='e-judges-result'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div class="modal fade" id="addContestantModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -319,63 +366,6 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewCriteriaResultModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><strong>View Criteria Result</strong></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-
-                    <div id='e-criterias-result'></div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewContestantResultModal" tabindex="-1" aria-labelledby="addContestantModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><strong>View Contestant Result</strong></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-
-                    <div id='e-contestant-result'></div>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewJudgeResultModal" tabindex="-1" aria-labelledby="addJudgeModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><strong>View Judge Result</strong></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-
-                    <div id='e-judge-result'></div>
-                    
-                </div>
             </div>
         </div>
     </div>
