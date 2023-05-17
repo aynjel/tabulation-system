@@ -25,20 +25,20 @@ try{
     $html_table = '<div class="table-responsive">';
 
     $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
-    $html_table .= '<h3 class="text-center text-uppercase">'.$c->contestant_name.'</h3>';
+    $html_table .= '<h3 class="text-center text-uppercase">'.$c->contestant_name.' ('.$c->contestant_description.')</h3>';
     $html_table .= '<h4 class="text-center text-uppercase">('.$e->event_description.')</h4>';
 
-    $html_table .= '<table class="table table-bordered table-hover" style="width: 100%;" id="contestant-result-table">';
+    $html_table .= '<table class="table table-bordered table-hover table-striped table-sm text-center align-middle" style="white-space: nowrap; width: 100%; font-size: 12px;" id="contestant-result-table">';
     $html_table .= '<thead>';
     $html_table .= '<tr>';
-    $html_table .= '<th>Criteria</th>';
+    $html_table .= '<th class="text-center">Criteria</th>';
 
     foreach($judges as $jud){
-        $html_table .= '<th>'.$jud->judge_name.'</th>';
+        $html_table .= '<th class="text-center">'.$jud->judge_name.'</th>';
     }
 
-    $html_table .= '<th>Total</th>';
-    $html_table .= '<th>Ranking</th>';
+    $html_table .= '<th class="text-center">Total</th>';
+    $html_table .= '<th class="text-center">Ranking</th>';
     $html_table .= '</tr>';
     $html_table .= '</thead>';
     $html_table .= '<tbody>';
@@ -62,10 +62,6 @@ try{
 
     $html_table .= '</tbody>';
     $html_table .= '</table>';
-
-    $html_table .= '<div class="text-right" id="print-btn-contestant">';
-    $html_table .= '<button class="btn btn-primary btn-sm" onclick="PrintContestantResult()" id="print-btn-contestant"><i class="fa fa-print"></i> Print Result</button>';
-    $html_table .= '</div>';
     $html_table .= '</div>';
 
     echo json_encode([

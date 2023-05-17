@@ -20,23 +20,20 @@ try{
     
         $score_data = $score->findBy('criteria_id', $criteria_id);
 
-        $cs = 0;
-        $rank = 0;
-        foreach($score_data as $sd){
-            
-            if($sd->judge_id == $judge->getJudgeId()){
-                if($sd->contestant_id == $cd->id){
-                    $cs = $sd->score;
-                }
+        $contestant_score = 0;
+
+        foreach ($score_data as $sd) {
+            if ($sd->judge_id == $judge->getJudgeId() && $sd->contestant_id == $cd->id) {
+                $contestant_score = $sd->score;
             }
-            
         }
+
         $contestants_data[] = [
             'id' => $cd->id, 
             'name' => $cd->contestant_name, 
             'number' => $cd->contestant_number,
             'baranggay' => $cd->contestant_description,
-            'score' => $cs
+            'score' => $contestant_score,
         ];
 
     }
@@ -45,7 +42,7 @@ try{
         echo json_encode([
             'status' => 'success',
             'message' => 'Contestants found',
-            'data' => $contestants_data
+            'data' => $contestants_data,
         ], JSON_PRETTY_PRINT);
     }else{
         echo json_encode([

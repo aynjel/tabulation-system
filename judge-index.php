@@ -112,7 +112,7 @@ $title = 'Judge';
                                             <th scope="col" class="text-center">Baranggay</th>
                                             <th scope="col" class="text-center">Name</th>
                                             <th scope="col" class="text-center">Score (1 - 10)</th>
-                                            <!-- <th scope="col" class="text-center" id="header-ranking">Ranking</th> -->
+                                            <th scope="col" class="text-center" id="header-ranking">Ranking</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -440,10 +440,13 @@ $title = 'Judge';
                                 }
 
                                 html += "</td>";
+                                html += "<td class='text-center'>0</td>";
                                 
                                 html += "</tr>";
                             }
                             $("#j-contestants-table tbody").html(html);
+
+                            
                         } else {
                             Toast(result.status, result.message);
                         }

@@ -173,10 +173,18 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
 
 <div class="modal fade" id="viewCriteriaResultModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><strong>View Criteria Result</strong></h5>
+                <h5 class="modal-title">
+                    <strong>View Criteria Result</strong>
+
+                    <div class="text-center mx-auto d-inline" id="print-btn-criteria">
+                        <button class="btn btn-primary btn-sm" onclick="PrintCriteriaResult()" id="print-btn-criteria">
+                        <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -188,10 +196,18 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
 
 <div class="modal fade" id="viewContestantResultModal" tabindex="-1" aria-labelledby="addContestantModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><strong>View Contestant Result</strong></h5>
+                <h5 class="modal-title">
+                    <strong>View Contestant Result</strong>
+
+                    <div class="text-center mx-auto d-inline" id="print-btn-contestant">
+                        <button class="btn btn-primary btn-sm" onclick="PrintContestantResult()" id="print-btn-contestant">
+                        <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -203,10 +219,18 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
 
 <div class="modal fade" id="viewJudgeResultModal" tabindex="-1" aria-labelledby="addJudgeModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><strong>View Judge Result</strong></h5>
+                <h5 class="modal-title">
+                    <strong>View Judge Result</strong>
+
+                    <div class="text-center mx-auto d-inline" id="print-btn-judge">
+                        <button class="btn btn-primary btn-sm" onclick="PrintJudgeResult()" id="print-btn-judge">
+                        <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

@@ -4,7 +4,9 @@ require('./autoload.php');
 
 try{
     $judge_id = Input::get('judge_id');
-    // $judge_id = 24;
+    $criteria_id = Input::get('criteria_id');
+    // $judge_id = 25;
+    // $criteria_id = 3;
 
     $judge = new Judge();
 
@@ -16,65 +18,87 @@ try{
 
     $criteria = new Criteria();
     
-    $criterias = $criteria->findBy('event_id', $j->event_id);
+    $cri = $criteria->find($criteria_id);
     
     $contestant = new Contestant();
-    
-    $contestants = $contestant->findBy('event_id', $j->event_id);
 
     $html_table = '<div class="table-responsive">';
 
     $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
-    $html_table .= '<h3 class="text-center text-uppercase">'.$j->judge_name.'</h3>';
-    $html_table .= '<h4 class="text-center text-uppercase">('.$e->event_description.')</h4>';
+    $html_table .= '<h3 class="text-center text-uppercase">'.$j->judge_name.' - Judge Scores</h3>';
+    $html_table .= '<h4 class="text-center text-uppercase">('.$cri->criteria_name.') - '.$e->event_description.'</h4>';
 
-    $html_table .= '<table class="table table-bordered table-hover" style="width: 100%;" id="judge-result-table">';
+    $html_table .= '<table class="table table-bordered table-hover table-striped table-sm text-center align-middle" style="width: 100%; font-size: 12px;" id="judge-result-table">';
     $html_table .= '<thead>';
-    $html_table .= '<tr>';
-    $html_table .= '<th>Number</th>';
-    $html_table .= '<th>Baranggay</th>';
-    $html_table .= '<th>Name</th>';
+    $html_table .= '<tr class="text-uppercase">';
+    $html_table .= '<th class="text-center">No.</th>';
+    $html_table .= '<th class="text-center">Baranggay</th>';
+    $html_table .= '<th class="text-center">Name</th>';
 
-    foreach($criterias as $c){
-        $html_table .= '<th>'.$c->criteria_name.'</th>';
-    }
-
-    $html_table .= '<th>Total</th>';
-    $html_table .= '<th>Ranking</th>';
+    $html_table .= '<th class="text-center">Score</th>';
+    $html_table .= '<th class="text-center">Ranking</th>';
     $html_table .= '</tr>';
     $html_table .= '</thead>';
     $html_table .= '<tbody>';
 
-    foreach($contestants as $con){
+    $sc = new Score();
+
+    $scores_data = $sc->GetScoresByCriteriaAndJudge($criteria_id, $judge_id);
+    
+    $contestant_data = [];
+
+    foreach($scores_data as $s){
+        
+        $cont = $contestant->find($s->contestant_id);
+        
+        array_push($contestant_data, [
+            'contestant_description' => $cont->contestant_description,
+            'contestant_number' => $cont->contestant_number,
+            'contestant_name' => $cont->contestant_name,
+            'contestant_id' => $s->contestant_id,
+            'score' => $s->score
+        ]);
+    }
+
+    usort($contestant_data, function($a, $b) {
+        return $b['score'] <=> $a['score'];
+    });
+
+    $count = array_count_values(array_column($contestant_data, 'score'));
+
+    $rank = 0;
+    $dupctr = 1;
+
+    foreach($contestant_data as $c){
         $html_table .= '<tr>';
-        $html_table .= '<td>'.$con->contestant_number.'</td>';
-        $html_table .= '<td>'.$con->contestant_description.'</td>';
-        $html_table .= '<td>'.$con->contestant_name.'</td>';
+        $html_table .= '<td>'.$c['contestant_number'].'</td>';
+        $html_table .= '<td>'.$c['contestant_description'].'</td>';
+        $html_table .= '<td>'.$c['contestant_name'].'</td>';
 
-        $total = 0;
-        $ranking = 0;
-
-        foreach($criterias as $cri){
-            $scr = $contestant->getScoreByJudge($j->id, $cri->id, $con->id);
-            // get ranking by total score
-            $ranking = $contestant->getRankingByJudge($judge_id, $cri->id, $con->id);
-            $total += $scr;
-            $html_table .= '<td>'. $scr .'</td>';
+        $dup = $count[$c['score']];           
+        if($count[$c['score']] === 1){
+            $rank++;
+            $html_table .= '<td>'.$c['score'].'</td>';
+            $html_table .= '<td>'.$rank.'</td>';
         }
-
-
-        $html_table .= '<td>'.$total.'</td>';
-        $html_table .= '<td>'.$ranking.'</td>';
-        $html_table .= '</tr>';
+        else if($dup > 1 && $dupctr < $dup) {
+            $html_table .= '<td>'.$c['score'].'</td>';
+            $html_table .= '<td>'.($rank + 1.5).'</td>';
+            $dupctr++;
+        }
+        else{
+            $html_table .= '<td>'.$c['score'].'</td>';
+            $html_table .= '<td>'.($rank + 1.5).'</td>';
+            $rank += $dup;
+            $dupctr = 1;
+        }
     }
 
     $html_table .= '</tbody>';
     $html_table .= '</table>';
+    $html_table .= '</div>';
 
-    $html_table .= '<div class="text-right" id="print-btn-contestant">';
-    $html_table .= '<button class="btn btn-primary btn-sm" onclick="PrintJudgeResult()" id="print-btn-judge"><i class="fa fa-print"></i> Print Result</button>';
-    $html_table .= '</div>';
-    $html_table .= '</div>';
+    // echo $html_table;
 
     echo json_encode([
         'status' => 'success',

@@ -12,6 +12,10 @@ class Contestant extends Model{
         return $this->all('contestant_number', 'ASC');
     }
 
+    public function getContestants($event_id){
+        return $this->findBy('event_id', $event_id);
+    }
+
     // get the score of a contestant based on the criteria
     public function getScore($criteria_id, $contestant_id){
         $score = new Score();

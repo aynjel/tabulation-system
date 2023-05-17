@@ -8,40 +8,97 @@
 </head>
 <body>
     
-    <table border="1" id="example" class="display nowrap" style="width:100%">
+    <table border="1" id="example" style="width:100%; white-space: nowrap;">
         <thead>
             <tr>
-                <th colspan="3">id</th>
-                <th>name</th>
-                <th>number</th>
+                <th>score</th>
+                <th>rank</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>John</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>John</td>
-                <td>2</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>John</td>
-                <td>3</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>John</td>
-                <td>4</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>John</td>
-                <td>5</td>
-            </tr>
+            <?php
+
+            require('./autoload.php');
+
+            $contestant = new Contestant();
+
+            $criteria_id = 3;
+
+            $criteria = new Criteria();
+
+            $cri = $criteria->find($criteria_id);
+
+            $event = new Event();
+
+            $e = $event->find($cri->event_id);
+
+            echo "<h1>" . $e->event_name . "</h1>";
+
+            echo "<h1>" . $cri->criteria_name . "</h1>";
+
+            $scores_data = [];
+
+            $score = new Score();
+
+            $scores = ['10', '11', '12', '13', '14', '15', '16', '17', '17', '19'];
+
+            $ranking = $score->getRankings($scores);
+            
+            echo array_sum($scores) / count($scores);
+
+            // $total = 0;
+
+            // foreach($scores as $s){
+
+            //     $con = $contestant->find($s->contestant_id);
+                
+            //     if(!in_array($con->id, array_column($scores_data, 'contestant_id'))){
+            //         array_push($scores_data, [
+            //             'contestant_id' => $con->id,
+            //             'score' => $s->score
+            //         ]);
+            //     }else{
+            //         $index = array_search($con->id, array_column($scores_data, 'contestant_id'));
+
+            //         $scores_data[$index]['score'] += $s->score;
+            //     }
+                
+            //     $total += $s->score;
+                
+            // }
+
+            // usort($scores_data, function($a, $b){
+            //     return $b['score'] <=> $a['score'];
+            // });
+
+            // foreach($scores_data as $s){
+            //     echo "<tr>";
+            //     echo "<td>" . $contestant->find($s['contestant_id'])->contestant_description . "</td>";
+            //     echo "<td>" . $contestant->find($s['contestant_id'])->contestant_name . "</td>";
+            //     echo "<td>" . number_format($s['score'], 2) . "</td>";
+
+            //     $rank = 0;
+
+            //     foreach($scores_data as $sd){
+            //         if($s['score'] < $sd['score']){
+            //             $rank++;
+            //         }
+            //     }
+
+            //     echo "<td>" . ($rank + 1) . "</td>";
+            //     echo "</tr>";
+            // }
+
+            // // H::debug($count);
+
+            
+            // // sort($scores_data);
+
+            
+
+            
+
+            ?>
         </tbody>
     </table>
 

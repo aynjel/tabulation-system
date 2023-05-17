@@ -7,6 +7,82 @@ class Score extends Model{
         parent::__construct($this->table);
     }
 
+    public function GetScoresByCriteriaAndJudge($criteria_id, $judge_id){
+        $scores = $this->findBy('criteria_id', $criteria_id);
+
+        $scores_data = [];
+
+        foreach($scores as $s){
+            if($s->judge_id == $judge_id){
+                array_push($scores_data, $s);
+            }
+        }
+
+        return $scores_data;
+    }
+
+    public function GetScoresByCriteria($criteria_id){
+        $scores = $this->findBy('criteria_id', $criteria_id);
+
+        return $scores;
+    }
+
+    public function getRankings($scores) {
+        $rankings = array();
+        $rank = 1;
+        $count = 1;
+        $previousScore = null;
+    
+        foreach ($scores as $score) {
+            if ($score === $previousScore) {
+                $rankings[] = $rank - 0.5;
+                $count++;
+            } else {
+                for ($i = 0; $i < $count; $i++) {
+                    $rankings[] = $rank;
+                }
+                $rank += $count;
+                $count = 1;
+            }
+            $previousScore = $score;
+        }
+    
+        // Handle the last group of participants
+        for ($i = 0; $i < $count; $i++) {
+            $rankings[] = $rank;
+        }
+    
+        return $rankings;
+    }
+
+    public function GetRankingByJudge($scores, $judge_id){
+        $rankings = array();
+        $rank = 1;
+        $count = 1;
+        $previousScore = null;
+    
+        foreach ($scores as $score) {
+            if ($score === $previousScore) {
+                $rankings[] = $rank - 0.5;
+                $count++;
+            } else {
+                for ($i = 0; $i < $count; $i++) {
+                    $rankings[] = $rank;
+                }
+                $rank += $count;
+                $count = 1;
+            }
+            $previousScore = $score;
+        }
+    
+        // Handle the last group of participants
+        for ($i = 0; $i < $count; $i++) {
+            $rankings[] = $rank;
+        }
+    
+        return $rankings;
+    }
+
     public function GetContestantScore($event_id, $contestant_id, $criteria_id, $judge_id){
         $scores = $this->findBy('event_id', $event_id);
 
@@ -21,35 +97,23 @@ class Score extends Model{
         }
     }
 
-    function tabulateScores(array $scores): array
-    {
-        // Group scores by value
-        $scoreGroups = array_reduce($scores, function ($groups, $score) {
-            if (!isset($groups[$score])) {
-                $groups[$score] = ['count' => 0, 'rank' => null];
-            }
-            $groups[$score]['count']++;
-            return $groups;
-        }, []);
+    public function GetRankingTotalScore(){
+        
+    }
 
-        // Assign ranks to groups
-        $rank = 1;
-        foreach ($scoreGroups as &$group) {
-            if ($group['rank'] !== null) {
-                // If the rank is already assigned, move to next rank
-                $rank++;
+    function TabulatedData($event_id, $criteria_id, $judge_id){
+        $scores = $this->findBy('event_id', $event_id);
+
+        $scores_data = [];
+
+        foreach($scores as $s){
+            if($s->judge_id == $judge_id){
+                if($s->criteria_id == $criteria_id){
+                    array_push($scores_data, $s->score);
+                }
             }
-            $group['rank'] = $rank;
-            $rank += $group['count'] - 1;
         }
 
-        // Convert groups to tabulated scores
-        return array_map(function ($score) use ($scoreGroups) {
-            return [
-                'score' => $score,
-                'count' => $scoreGroups[$score]['count'],
-                'rank' => $scoreGroups[$score]['rank'] + ($scoreGroups[$score]['count'] - 1) / 2
-            ];
-        }, array_keys($scoreGroups));
+        return $scores_data;
     }
 }

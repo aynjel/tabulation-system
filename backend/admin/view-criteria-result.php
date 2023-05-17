@@ -27,30 +27,30 @@ try{
     $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
     $html_table .= '<h3 class="text-center text-uppercase">'.$cri->criteria_name.'</h3>';
     $html_table .= '<h4 class="text-center text-uppercase">('.$e->event_description.')</h4>';
+    $html_table .= '<p class="text-center text-uppercase">('.date('F d, Y', strtotime($e->event_date)).' - '.date('H:i A', strtotime($e->event_time)).')</p>';
 
-    $html_table .= '<table class="table table-bordered table-hover" style="width: 100%;" id="criteria-result-table">';
-    $html_table .= '<thead>';
+    $html_table .= '<table class="table table-bordered table-hover table-striped table-sm text-center align-middle" style="width: 100%; white-space: nowrap; font-size: 12px;" id="criteria-result-table">';
+    $html_table .= '<thead class="thead-dark text-uppercase">';
     $html_table .= '<tr>';
-    $html_table .= '<th>Number</th>';
-    $html_table .= '<th>Baranggay</th>';
-    $html_table .= '<th>Name</th>';
+    $html_table .= '<th class="text-center">No.</th>';
+    $html_table .= '<th class="text-center">Baranggay</th>';
+    $html_table .= '<th class="text-center">Name</th>';
 
     foreach($judges as $j){
-        $html_table .= '<th>'.$j->judge_name.'</th>';
-        $html_table .= '<th>Ranking ('.$j->judge_name.')</th>';
+        $html_table .= '<th class="text-center">'.$j->judge_name.'</th>';
     }
 
-    $html_table .= '<th>Total</th>';
-    $html_table .= '<th>Ranking</th>';
+    $html_table .= '<th class="text-center">Total</th>';
+    $html_table .= '<th class="text-center">Ranking</th>';
     $html_table .= '</tr>';
     $html_table .= '</thead>';
-    $html_table .= '<tbody>';
+    $html_table .= '<tbody class="text-center">';
 
     foreach($contestants as $c){
         $html_table .= '<tr>';
         $html_table .= '<td>'.$c->contestant_number.'</td>';
         $html_table .= '<td>'.$c->contestant_description.'</td>';
-        $html_table .= '<td>'.$c->contestant_name.'</td>';
+        $html_table .= '<td style="white-space: nowrap;">'.$c->contestant_name.'</td>';
 
         $total = 0;
 
@@ -59,20 +59,20 @@ try{
 
             $total += $scr;
             $html_table .= '<td>'.$scr.'</td>';
-            $html_table .= '<td>'.$contestant->getRankingByJudge($j->id, $criteria_id, $c->id).'</td>';
         }
 
         $html_table .= '<td class="criteria-total-score">'.number_format($total, 2).'</td>';
-        $html_table .= '<td class="criteria-ranking">'.$contestant->getRanking($criteria_id, $c->id).'</td>';
+
+        $score = new Score();
+
+        $html_table .= '<td class="criteria-ranking">0</td>';
+
         $html_table .= '</tr>';
     }
 
     $html_table .= '</tbody>';
     $html_table .= '</table>';
 
-    $html_table .= '<div class="text-right" id="print-btn-contestant">';
-    $html_table .= '<button class="btn btn-primary btn-sm" onclick="PrintCriteriaResult()" id="print-btn-criteria"><i class="fa fa-print"></i> Print Result</button>';
-    $html_table .= '</div>';
     $html_table .= '</div>';
 
     echo json_encode([

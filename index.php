@@ -340,8 +340,16 @@ $title = ucwords(str_replace('-', ' ', $page));
                         judge_html += "<td>" + judge[i].judge_name + "</td>";
                         judge_html += "<td>" + judge[i].judge_username + "</td>";
                         judge_html += "<td>" + judge[i].judge_password + "</td>";
-                        judge_html +=
-                            "<td><div class='btn-group'><button class='btn btn-sm btn-primary' onclick='ViewJudgeResult(" + judge[i].id + ")'>Result</button><button class='btn btn-sm btn-danger' onclick='DeleteJudge(" + judge[i].id + ")'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditJudge(" + judge[i].id + ")'><i class='bi bi-pencil'></i></button></div></td>";
+                        judge_html += `<td><div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Results
+                            </button>
+                            <ul class="dropdown-menu">`;
+                            $.each(data.criterias, function (key, value) {
+                                judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeResult(${judge[i].id},${value.id})">${value.criteria_name}</button></li>`;
+                            });
+                            `</ul></div></td>`;
+                        judge_html += `<td><div class='btn-group'><button class='btn btn-sm btn-danger' onclick='DeleteJudge(${judge[i].id})'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditJudge(${judge[i].id })'><i class='bi bi-pencil'></i></button></div></td>`;
                         judge_html += "</tr>";
                     }
                     $("#e-judges-table tbody").html(judge_html);
@@ -476,34 +484,36 @@ $title = ucwords(str_replace('-', ' ', $page));
                     Swal.showLoading();
                 },
             });
-            $.ajax({
-                url: "./backend/admin/view-criteria-result.php",
-                type: "POST",
-                data: {
-                    criteria_id: criteria_id
-                },
-                success: function (data) {
-                    data = JSON.parse(data);
-                    if (data.status == 'error') {
-                        Toast(data.status, data.message);
-                    } else {
-                        $("#e-criterias-result").html(data.html);
-                        $("#criteria-result-table").DataTable({
-                            "paging": false,
-                            "info": false,
-                            "searching": false,
-                            "responsive": true,
-                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
-                            "language": {
-                                "emptyTable": "No contestant found"
-                            }
-                        });
-                        $("#viewCriteriaResultModal").modal('show');
-                        Swal.close();
-                    }
+            setTimeout(function () {
+                $.ajax({
+                    url: "./backend/admin/view-criteria-result.php",
+                    type: "POST",
+                    data: {
+                        criteria_id: criteria_id
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.status == 'error') {
+                            Toast(data.status, data.message);
+                        } else {
+                            $("#e-criterias-result").html(data.html);
+                            $("#criteria-result-table").DataTable({
+                                "paging": false,
+                                "info": false,
+                                "searching": false,
+                                "responsive": true,
+                                "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                                "language": {
+                                    "emptyTable": "No contestant found"
+                                }
+                            });
+                            $("#viewCriteriaResultModal").modal('show');
+                            Swal.close();
+                        }
 
-                }
-            });
+                    }
+                });
+            }, 500);
         }
 
         function PrintCriteriaResult(){
@@ -529,37 +539,40 @@ $title = ucwords(str_replace('-', ' ', $page));
                     Swal.showLoading();
                 },
             });
-            $.ajax({
-                url: "./backend/admin/view-contestant-result.php",
-                type: "POST",
-                data: {
-                    contestant_id: contestant_id
-                },
-                success: function (data) {
-                    data = JSON.parse(data);
-                    if (data.status == 'error') {
-                        Toast(data.status, data.message);
-                    } else {
-                        $("#e-contestants-result").html(data.html);
-                        $("#contestant-result-table").DataTable({
-                            "paging": false,
-                            "info": false,
-                            "searching": false,
-                            "responsive": true,
-                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
-                            "language": {
-                                "emptyTable": "No contestant found"
-                            }
-                        });
-                        $("#viewContestantResultModal").modal('show');
+
+            setTimeout(function () {
+                $.ajax({
+                    url: "./backend/admin/view-contestant-result.php",
+                    type: "POST",
+                    data: {
+                        contestant_id: contestant_id
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.status == 'error') {
+                            Toast(data.status, data.message);
+                        } else {
+                            $("#e-contestants-result").html(data.html);
+                            $("#contestant-result-table").DataTable({
+                                "paging": false,
+                                "info": false,
+                                "searching": false,
+                                "responsive": true,
+                                "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                                "language": {
+                                    "emptyTable": "No contestant found"
+                                }
+                            });
+                            $("#viewContestantResultModal").modal('show');
+                            Swal.close();
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
                         Swal.close();
                     }
-                },
-                error: function (data) {
-                    console.log(data);
-                    Swal.close();
-                }
-            });
+                });
+            }, 500);
         }
 
         function PrintContestantResult(){
@@ -576,7 +589,7 @@ $title = ucwords(str_replace('-', ' ', $page));
             document.body.innerHTML = originalContents;
         }
 
-        function ViewJudgeResult(judge_id) {
+        function ViewJudgeResult(judge_id, criteria_id) {
             Swal.fire({
                 title: 'Tallying result...',
                 allowOutsideClick: false,
@@ -585,37 +598,41 @@ $title = ucwords(str_replace('-', ' ', $page));
                     Swal.showLoading();
                 },
             });
-            $.ajax({
-                url: "./backend/admin/view-judge-result.php",
-                type: "POST",
-                data: {
-                    judge_id: judge_id
-                },
-                success: function (data) {
-                    data = JSON.parse(data);
-                    if (data.status == 'error') {
-                        Toast(data.status, data.message);
-                    } else {
-                        $("#e-judges-result").html(data.html);
-                        $("#judge-result-table").DataTable({
-                            "paging": false,
-                            "info": false,
-                            "searching": false,
-                            "responsive": true,
-                            "dom": '<"top"i>rt<"bottom"flp><"clear">',
-                            "language": {
-                                "emptyTable": "No contestant found"
-                            }
-                        });
-                        $("#viewJudgeResultModal").modal('show');
+
+            setTimeout(function () {
+                $.ajax({
+                    url: "./backend/admin/view-judge-result.php",
+                    type: "POST",
+                    data: {
+                        judge_id: judge_id,
+                        criteria_id: criteria_id
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.status == 'error') {
+                            Toast(data.status, data.message);
+                        } else {
+                            $("#e-judges-result").html(data.html);
+                            $("#judge-result-table").DataTable({
+                                "paging": false,
+                                "info": false,
+                                "searching": false,
+                                "responsive": true,
+                                "dom": '<"top"i>rt<"bottom"flp><"clear">',
+                                "language": {
+                                    "emptyTable": "No contestant found"
+                                }
+                            });
+                            $("#viewJudgeResultModal").modal('show');
+                            Swal.close();
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
                         Swal.close();
                     }
-                },
-                error: function (data) {
-                    console.log(data);
-                    Swal.close();
-                }
-            });
+                });
+            }, 700);
         }
 
         function PrintJudgeResult(){
