@@ -9,6 +9,7 @@ $judge_id = Input::get('judge_id');
 $criteria_id = Input::get('criteria_id');
 $contestant_id = Input::get('contestant_id');
 $score = Input::get('score');
+$rank = Input::get('rank');
 
 try{
     if(!empty($score)) {
@@ -17,7 +18,8 @@ try{
             'judge_id' => $judge_id,
             'criteria_id' => $criteria_id,
             'contestant_id' => $contestant_id,
-            'score' => $score
+            'score' => $score,
+            'rank' => $rank
         ]);
 
         echo json_encode([

@@ -21,10 +21,12 @@ try{
         $score_data = $score->findBy('criteria_id', $criteria_id);
 
         $contestant_score = 0;
+        $contestant_rank = 0;
 
         foreach ($score_data as $sd) {
             if ($sd->judge_id == $judge->getJudgeId() && $sd->contestant_id == $cd->id) {
                 $contestant_score = $sd->score;
+                $contestant_rank = $sd->rank;
             }
         }
 
@@ -34,6 +36,7 @@ try{
             'number' => $cd->contestant_number,
             'baranggay' => $cd->contestant_description,
             'score' => $contestant_score,
+            'rank' => $contestant_rank
         ];
 
     }

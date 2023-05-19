@@ -376,12 +376,16 @@ $title = ucwords(str_replace('-', ' ', $page));
                         criteria_html += "</td>";
 
                         criteria_html +=
-                            "<td><div class='btn-group' role='group'><button class='btn btn-sm btn-primary' id='view-criteria-results-btn' onclick='ViewCriteriaResult(" +
+                            "<td><button class='btn btn-sm btn-primary' id='view-criteria-results-btn' onclick='ViewCriteriaResult(" +
                             criteria[i].id +
-                            ")'>Result</button><button class='btn btn-sm btn-danger' onclick='DeleteCriteria(" +
+                            ")'>Result</button></td>";
+
+                        criteria_html +=
+                            "<td><div class='btn-group' role='group'><button class='btn btn-sm btn-danger' onclick='DeleteCriteria(" +
                             criteria[i].id +
                             ")'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditCriteria(" +
                             criteria[i].id + ")'><i class='bi bi-pencil'></i></button></div></td>";
+
                         criteria_html += "</tr>";
                     }
                     $("#e-criterias-table tbody").html(criteria_html);
@@ -493,22 +497,19 @@ $title = ucwords(str_replace('-', ' ', $page));
                     },
                     success: function (data) {
                         data = JSON.parse(data);
-                        if (data.status == 'error') {
-                            Toast(data.status, data.message);
-                        } else {
-                            $("#e-criterias-result").html(data.html);
-                            $("#criteria-result-table").DataTable({
-                                "paging": false,
-                                "info": false,
-                                "searching": false,
-                                "responsive": true,
-                                "dom": '<"top"i>rt<"bottom"flp><"clear">',
-                                "language": {
-                                    "emptyTable": "No contestant found"
-                                }
-                            });
+                        if (data.status == 'success') {
+                            $("#e-criterias-result").html(data.html_table);
                             $("#viewCriteriaResultModal").modal('show');
                             Swal.close();
+                        }else{
+                            Swal.close();
+                            Swal.fire({
+                                title: 'No result found!',
+                                text: data.message,
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
                         }
 
                     }

@@ -7,6 +7,32 @@ class Score extends Model{
         parent::__construct($this->table);
     }
 
+    public function GetScoreByContestantAndJudge($contestant_id, $judge_id, $criteria_id){
+        $scores = $this->findBy('contestant_id', $contestant_id);
+
+        foreach($scores as $s){
+            if($s->judge_id == $judge_id){
+                if($s->criteria_id == $criteria_id){
+                    return $s;
+                }
+            }
+        }
+    }
+
+    public function GetJudgesWhoSubmittedScores($criteria_id){
+        $scores = $this->findBy('criteria_id', $criteria_id);
+
+        $judges = [];
+        
+        foreach($scores as $s){
+            if(!in_array($s->judge_id, $judges)){
+                array_push($judges, $s->judge_id);
+            }
+        }
+
+        return $judges;
+    }
+
     public function GetScoresByCriteriaAndJudge($criteria_id, $judge_id){
         $scores = $this->findBy('criteria_id', $criteria_id);
 

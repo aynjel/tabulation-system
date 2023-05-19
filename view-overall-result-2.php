@@ -128,16 +128,79 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
                     event_id: event_id
                 },
                 success: function (data) {
-                    $("#overall-result").html(data);
+                    data = JSON.parse(data);
+
+                    if (data.status == 'success') {
+                        var contestant_result_html = "";
+
+                        contestant_result_html += "<h1 class='text-center text-uppercase'>" + data
+                            .event.event_name + "</h1>";
+                        contestant_result_html += "<h3 class='text-center text-uppercase'>Overall Result - " + data
+                            .event.event_description + "</h3>";
+
+                        contestant_result_html += "<table class='table table-bordered border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 14px;'>";
+                        contestant_result_html += "<thead>";
+                        contestant_result_html += "<tr>";
+                        contestant_result_html += "<th class='text-center' rowspan='2'>#</th>";
+                        contestant_result_html += "<th class='text-center' rowspan='2'>Baranggay</th>";
+                        contestant_result_html += "<th class='text-center' rowspan='2'>Name</th>";
+
+                        $.each(data.criterias, function (index, value) {
+                            contestant_result_html += "<th class='text-center' colspan='" + (data
+                                .judges.length + 1) + "'>" + value.criteria_name.replace(/ /g, "&nbsp;") + "</th>";
+                        });
+
+                        contestant_result_html += "</tr>";
+                        
+                        contestant_result_html += "<tr>";
+                        $.each(data.criterias, function (index, value) {
+                            $.each(data.judges, function (index, value) {
+                                contestant_result_html += "<th class='text-center'>" + value.judge_name
+                                    .replace(/ /g, "&nbsp;") + "</th>";
+                            });
+                            contestant_result_html += "<th class='text-center'>Total</th>";
+                        });
+                        contestant_result_html += "</tr>";
+
+                        contestant_result_html += "</thead>";
+                        contestant_result_html += "<tbody>";
+
+                        $.each(data.contestants, function (index, value) {
+                            contestant_result_html += "<tr>";
+                            contestant_result_html += "<td class='text-center'>" + value.contestant_number +
+                                "</td>";
+                            contestant_result_html += "<td class='text-center'>" + value.contestant_description.replace(/ /g, "&nbsp;") +
+                                "</td>";
+                            contestant_result_html += "<td class='text-center'>" + value.contestant_name.replace(/ /g, "&nbsp;") +
+                                "</td>";
+
+                            $.each(data.criterias, function (index, value) {
+                                $.each(data.judges, function (index, value) {
+                                    contestant_result_html += "<td class='text-center'>0</td>";
+                                });
+                                contestant_result_html += "<td class='text-center'>Total Score</td>";
+                            });
+
+                            contestant_result_html += "</tr>";
+                        });
+
+                        contestant_result_html += "</tbody>";
+                        contestant_result_html += "</table>";
+                        
+                        $("#overall-result").html(contestant_result_html);
+                    } else {
+                        Toast(data.status, data.message);
+                    }
+
                 }
             });
         }
         $(document).ready(function () {
             ViewOverallResult(<?=$event_id;?>);
 
-            setInterval(function () {
-                ViewOverallResult(<?=$event_id;?>);
-            }, 1000);
+            // setInterval(function () {
+            //     ViewOverallResult(<?=$event_id;?>);
+            // }, 1000);
         });
     </script>
 

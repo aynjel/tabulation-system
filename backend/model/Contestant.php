@@ -33,6 +33,27 @@ class Contestant extends Model{
         return $total;
     }
 
+    public function GetTotalByCriteria($criteria_id, $contestant_id){
+        $score = new Score();
+
+        $scores = $score->findBy('criteria_id', $criteria_id);
+
+        $total_s = 0;
+        $total_r = 0;
+
+        foreach($scores as $s){
+            if($s->contestant_id == $contestant_id){
+                $total_s += $s->score;
+                $total_r += $s->rank;
+            }
+        }
+
+        return [
+            'score' => $total_s,
+            'rank' => $total_r
+        ];
+    }
+
     public function getTotalScore($contestant_id){
         $score = new Score();
 
@@ -72,10 +93,12 @@ class Contestant extends Model{
         $scores = $score->findBy('criteria_id', $criteria_id);
 
         $total = 0;
+        $rank = 0;
 
         foreach($scores as $s){
             if($s->contestant_id == $contestant_id && $s->judge_id == $judge_id){
                 $total += $s->score;
+                $rank += $s->rank;
             }
         }
 

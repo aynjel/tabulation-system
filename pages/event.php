@@ -95,6 +95,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Percentage</th>
                                                     <th scope="col">Status</th>
+                                                    <th scope="col">Result</th>
                                                     <th scope="col">Action</th>
                                                 </tr>
                                             </thead>

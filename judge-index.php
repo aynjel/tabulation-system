@@ -112,7 +112,7 @@ $title = 'Judge';
                                             <th scope="col" class="text-center">Baranggay</th>
                                             <th scope="col" class="text-center">Name</th>
                                             <th scope="col" class="text-center">Score (1 - 10)</th>
-                                            <th scope="col" class="text-center" id="header-ranking">Ranking</th>
+                                            <th scope="col" class="text-center d-none" id="header-ranking">Ranking</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -304,6 +304,7 @@ $title = 'Judge';
                             
                             if(criteria_id != criteria.criteria_id){
                                 criteria_id = criteria.criteria_id;
+                                $("#header-ranking").addClass("d-none");
                                 GetContestants();
                             }
 
@@ -424,10 +425,10 @@ $title = 'Judge';
                                 html += "<td class='text-center'>" + contestants[i].number + "</td>";
                                 html += "<td class='text-center'>" + contestants[i].baranggay + "</td>";
                                 html += "<td class='text-center'>" + contestants[i].name + "</td>";
-                                html += "<td class='text-center'>";
-
+                                
                                 // check if the contestant has a score else show the score form
-                                if(contestants[i].score == null || contestants[i].score == 0){
+                                if(contestants[i].score == null || contestants[i].score == 0 || contestants[i].rank == null || contestants[i].rank == 0){
+                                    html += "<td class='text-center'>";
                                     html += "<form class='form-score'>";
                                     html += "<input type='hidden' name='contestant_id' value='" + contestants[i].id + "'>";
                                     html += "<input type='hidden' name='event_id' value='" + event_id + "'>";
@@ -435,12 +436,14 @@ $title = 'Judge';
                                     html += "<input type='hidden' name='criteria_id' value='" + criteria_id + "'>";
                                     html += "<input type='number' name='score' class='form-control score text-center mx-auto w-50' min='0' max='10' step='0.01' placeholder='Score'>";
                                     html += "</form>";
+                                    html += "</td>";
                                 } else {
-                                    html += "<span class='text-success'>" + contestants[i].score + "</span>";
+                                    html += "<td class='text-success'>" + contestants[i].score + "</td>";
+
+                                    $("#header-ranking").removeClass("d-none");
+                                    html += "<td class='text-success'>" + contestants[i].rank + "</td>";
                                 }
 
-                                html += "</td>";
-                                html += "<td class='text-center'>0</td>";
                                 
                                 html += "</tr>";
                             }
@@ -472,35 +475,85 @@ $title = 'Judge';
 
                 if(isFilled){
                     var forms = $(".form-score");
-                    
+
+                    // variable to store all score data
+                    var score_data = [];
+
                     for (var i = 0; i < forms.length; i++) {
                         var form = forms[i];
+                        score_data.push({
+                            contestant_id: $(form).find("input[name='contestant_id']").val(),
+                            score: $(form).find("input[name='score']").val()
+                        });
+                    }
+
+                    score_data.sort(function(a, b) {
+                        return parseFloat(b.score) - parseFloat(a.score);
+                    });
+
+                    const count = {};
+
+                    for (let i = 0; i < score_data.length; i++) {
+                        var currentScore = score_data[i].score;
+                        if (count[currentScore]) {
+                            count[currentScore]++;
+                        } else {
+                            count[currentScore] = 1;
+                        }
+                    }
+
+                    var rank = 0;
+                    var dupctr = 1;
+
+                    // loop through score data
+                    $.each(score_data, function(index, score) {
+                        var dup = count[score.score];
+
+                        // variable to store rank of contestant
+                        var contestant_rank = 0;
+
+                        // if score is not duplicate
+                        if (dup == 1) {
+                            rank++;
+                            console.log("Contestant ID: " + score.contestant_id + " SCORE: " + score.score + " RANK:" + rank);
+                            contestant_rank = rank;
+                        } else if (dup > 1 && dupctr < dup) {
+                            console.log("Contestant ID: " + score.contestant_id + " SCORE: " + score.score + " RANK:" + (rank + 1.5));
+                            contestant_rank = rank + 1.5;
+                            dupctr++;
+                        } else {
+                            console.log("Contestant ID: " + score.contestant_id + " SCORE: " + score.score + " RANK:" + (rank + 1.5));
+                            contestant_rank = rank + 1.5;
+                            rank += dup;
+                            dupctr = 1;
+                        }
+
+                        // submit score
                         $.ajax({
-                            url: './backend/judge/submit-scores.php',
-                            type: 'POST',
+                            url: "./backend/judge/submit-scores.php",
+                            method: "POST",
                             data: {
+                                event_id: event_id,
+                                judge_id: judge_id,
                                 criteria_id: criteria_id,
-                                judge_id: $(form).find('input[name="judge_id"]').val(),
-                                event_id: $(form).find('input[name="event_id"]').val(),
-                                contestant_id: $(form).find('input[name="contestant_id"]').val(),
-                                score: $(form).find('input[name="score"]').val()
+                                contestant_id: score.contestant_id,
+                                score: score.score,
+                                rank: contestant_rank
                             },
                             success: function (data) {
-                                var obj = JSON.parse(data);
-                                if (obj.status == 'success') {
-                                    
-                                    $("#judge-scores-modal").modal('show');
+                                var result = JSON.parse(data);
+                                if (result.status == "success") {
                                     $("#submit-all-score").attr("disabled", true);
-
-                                    setTimeout(function () {
-                                        $("#submit-all-score").html('Submit Score');
-                                        GetContestants();
-                                    }, 3000);
-                                    
+                                    $("#judge-scores-modal").modal("show");
+                                    GetContestants();
+                                } else {
+                                    Toast(result.status, result.message);
                                 }
                             }
                         });
-                    }
+                    });
+
+
                 }else{
                     Toast("error", "Please fill all score");
                     $("#submit-all-score").html("Submit");
