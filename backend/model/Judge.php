@@ -58,4 +58,21 @@ class Judge extends Model{
         $judge = $this->find($this->getJudgeId());
         return $judge->judge_name;
     }
+
+    // get judges that has scores in a criteria
+    public function GetJudgesWithScores($criteria_id){
+        $score = new Score();
+        $scores = $score->findBy('criteria_id', $criteria_id);
+
+        $judges = [];
+
+        foreach($scores as $s){
+            $judge = $this->find($s->judge_id);
+            if(!in_array($judge, $judges)){
+                array_push($judges, $judge);
+            }
+        }
+
+        return $judges;
+    }
 }

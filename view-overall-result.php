@@ -133,9 +133,9 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
             
             ViewOverallResult();
 
-            setInterval(function () {
-                ViewOverallResult();
-            }, 1000);
+            // setInterval(function () {
+            //     ViewOverallResult();
+            // }, 1000);
 
         });
     </script>

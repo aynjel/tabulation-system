@@ -57,7 +57,10 @@ class Contestant extends Model{
     public function GetAverageByCriteria($criteria_id, $contestant_id){
         $judge = new Judge();
 
-        $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
+        // $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
+        
+        // get judges that have scores for this criteria
+        $judges = $judge->GetJudgesWithScores($criteria_id);
 
         $score = new Score();
 
