@@ -45,8 +45,9 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
 
     <header id="header" class="header fixed-top d-flex align-items-center justify-content-center flex-column bg-white py-3">
 
-        <h1 class='text-center text-uppercase'><?= $e->event_name; ?></h1>
-        <h3 class='text-center text-uppercase'>Overall Result - <?= $e->event_description; ?></h3>
+        <h1 class='text-center text-uppercase'>
+            Overall Result 
+        </h1>
 
     </header>
 
@@ -54,7 +55,14 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
 
         <div class="container-fluid">
             <div class="card my-5">
-                <div class="card-body">
+                <div class="card-header">
+                    <!-- print button -->
+                    <button class="btn btn-primary btn-sm" onclick="PrintResult()">
+                        <i class="bi bi-printer"></i>
+                        Print
+                    </button>
+                </div>
+                <div class="card-body py-2">
                     <div id="e-overall-results-table"></div>
                 </div>
             </div>
@@ -83,11 +91,6 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./node_modules/toastr/build/toastr.min.js"></script>
     <script src="./node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-    <script src="./node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="./node_modules/datatables.net/js/dataTables.buttons.min.js"></script>
-    <script src="./node_modules/datatables.net/js/buttons.print.min.js"></script>
-    <script src="./node_modules/datatables.net/js/buttons.html5.min.js"></script>
-    <script src="./node_modules/datatables.net/js/jszip.min.js"></script>
 
     <script type="text/javascript">
         var event_id = <?= $event_id; ?>;
@@ -101,18 +104,26 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
                     event_id: event_id
                 },
                 success: function (data) {
-                    data = JSON.parse(data);
-
-                    if(data.status == 'success'){
-                        $("#e-overall-results-table").html(data.html_table);
-                    }else{
-                        $("#e-overall-results-table").html(data.message);
-                    }
+                    $("#e-overall-results-table").html(data);
                 },
                 error: function (data) {
                     console.log(data);
                 }
             });
+        }
+
+        function PrintResult(){
+            var printContents = document.getElementById("e-overall-results-table").innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            // hide print button in print preview
+            $(".card-header").hide();
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
         }
 
         $(document).ready(function () {
@@ -125,6 +136,7 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
             setInterval(function () {
                 ViewOverallResult();
             }, 1000);
+
         });
     </script>
 
