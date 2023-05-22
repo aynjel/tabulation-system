@@ -41,6 +41,7 @@ $title = ucwords(str_replace('-', ' ', $page));
                     <span class="text-primary">Admin</span> Dashboard
                 </span>
             </a>
+            
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
 
@@ -162,7 +163,6 @@ $title = ucwords(str_replace('-', ' ', $page));
     <script src="./node_modules/datatables.net/js/buttons.print.min.js"></script>
     <script src="./node_modules/datatables.net/js/buttons.html5.min.js"></script>
     <script src="./node_modules/datatables.net/js/jszip.min.js"></script>
-    <!-- <script src="./node_modules/datatables.net/js/pdfmake.min.js"></script> -->
 
     <script type="text/javascript">
         var event_id = 0;
@@ -324,9 +324,10 @@ $title = ucwords(str_replace('-', ' ', $page));
                         contestant_html += "<td>" + contestant[i].contestant_number + "</td>";
                         contestant_html += "<td>" + contestant[i].contestant_name + "</td>";
                         contestant_html += "<td>" + contestant[i].contestant_description + "</td>";
+                        contestant_html += "<td><button class='btn btn-sm btn-primary' onclick='ViewContestantResult(" + contestant[
+                                i].id + ")'>Result</button></td>";
                         contestant_html +=
-                            "<td><div class='btn-group'><button class='btn btn-sm btn-primary' onclick='ViewContestantResult(" + contestant[
-                                i].id + ")'>Result</button><button class='btn btn-sm btn-danger' onclick='DeleteContestant(" + contestant[i].id + ")'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditContestant(" + contestant[i].id + ")'><i class='bi bi-pencil'></i></button></div></td>";
+                            "<td><div class='btn-group'><button class='btn btn-sm btn-danger' onclick='DeleteContestant(" + contestant[i].id + ")'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditContestant(" + contestant[i].id + ")'><i class='bi bi-pencil'></i></button></div></td>";
                         contestant_html += "</tr>";
                     }
                     $("#e-contestants-table tbody").html(contestant_html);
@@ -406,7 +407,7 @@ $title = ucwords(str_replace('-', ' ', $page));
                     }
 
                     event_btn_html +=
-                        '<button type="button" class="btn btn-sm btn-info text-white" onclick="GoToViewOverallResult(' + id + ')">Overall Result</button>';
+                        '<button type="button" class="btn btn-sm btn-info text-white" onclick="GotoViewOverallResult(' + id + ')">Overall Result</button>';
 
                     event_btn_html += '</div>';
 
@@ -415,9 +416,9 @@ $title = ucwords(str_replace('-', ' ', $page));
             });
         }
 
-        function GoToViewOverallResult(event_id) {
+        function GotoViewOverallResult(id) {
             // target="_blank"
-            window.open("./view-overall-result.php?event_id=" + event_id, '_blank');
+            window.open("./view-overall-result.php?event_id=" + id, '_blank');
         }
 
         function StopEvent(id) {
@@ -481,9 +482,12 @@ $title = ucwords(str_replace('-', ' ', $page));
 
         function ViewCriteriaResult(criteria_id) {
             Swal.fire({
-                title: 'Tallying result...',
-                allowOutsideClick: false,
+                title: 'Tallying Criteria Result...',
+                text: 'Please wait...',
+                icon: 'info',
+                allowEscapeKey: false,
                 showConfirmButton: false,
+                allowOutsideClick: false,
                 willOpen: () => {
                     Swal.showLoading();
                 },
@@ -499,6 +503,7 @@ $title = ucwords(str_replace('-', ' ', $page));
                         data = JSON.parse(data);
                         if (data.status == 'success') {
                             $("#e-criterias-result").html(data.html_table);
+                            $("#criteria-modal-name").html(data.criteria_name);
                             $("#viewCriteriaResultModal").modal('show');
                             Swal.close();
                         }else{
@@ -511,7 +516,10 @@ $title = ucwords(str_replace('-', ' ', $page));
                                 timer: 1500
                             });
                         }
-
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        Swal.close();
                     }
                 });
             }, 500);
@@ -533,7 +541,10 @@ $title = ucwords(str_replace('-', ' ', $page));
 
         function ViewContestantResult(contestant_id) {
             Swal.fire({
-                title: 'Tallying result...',
+                title: 'Tallying Contestant Result...',
+                text: 'Please wait...',
+                icon: 'info',
+                allowEscapeKey: false,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 willOpen: () => {
@@ -550,22 +561,20 @@ $title = ucwords(str_replace('-', ' ', $page));
                     },
                     success: function (data) {
                         data = JSON.parse(data);
-                        if (data.status == 'error') {
-                            Toast(data.status, data.message);
-                        } else {
+                        if (data.status == 'success') {
                             $("#e-contestants-result").html(data.html);
-                            $("#contestant-result-table").DataTable({
-                                "paging": false,
-                                "info": false,
-                                "searching": false,
-                                "responsive": true,
-                                "dom": '<"top"i>rt<"bottom"flp><"clear">',
-                                "language": {
-                                    "emptyTable": "No contestant found"
-                                }
-                            });
+                            $("#contestant-modal-name").html(data.contestant_name);
                             $("#viewContestantResultModal").modal('show');
                             Swal.close();
+                        } else {
+                            Swal.close();
+                            Swal.fire({
+                                title: 'No result found!',
+                                text: data.message,
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
                         }
                     },
                     error: function (data) {
@@ -592,7 +601,10 @@ $title = ucwords(str_replace('-', ' ', $page));
 
         function ViewJudgeResult(judge_id, criteria_id) {
             Swal.fire({
-                title: 'Tallying result...',
+                title: 'Tallying Judge Result...',
+                text: 'Please wait...',
+                icon: 'info',
+                allowEscapeKey: false,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 willOpen: () => {
@@ -610,10 +622,9 @@ $title = ucwords(str_replace('-', ' ', $page));
                     },
                     success: function (data) {
                         data = JSON.parse(data);
-                        if (data.status == 'error') {
-                            Toast(data.status, data.message);
-                        } else {
+                        if (data.status == 'success') {
                             $("#e-judges-result").html(data.html);
+                            $("#judge-modal-name").html(data.judge);
                             $("#judge-result-table").DataTable({
                                 "paging": false,
                                 "info": false,
@@ -626,6 +637,8 @@ $title = ucwords(str_replace('-', ' ', $page));
                             });
                             $("#viewJudgeResultModal").modal('show');
                             Swal.close();
+                        } else {
+                            Toast(data.status, data.message);
                         }
                     },
                     error: function (data) {
@@ -944,7 +957,6 @@ $title = ucwords(str_replace('-', ' ', $page));
             });
         }
 
-        // delete
         function DeleteEvent(id) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -1090,6 +1102,10 @@ $title = ucwords(str_replace('-', ' ', $page));
         }
 
         $(document).ready(function () {
+
+            $(".toggle-sidebar-btn").on("click", function () {
+                $("body").toggleClass("toggle-sidebar");
+            });
 
             CheckUser();
             

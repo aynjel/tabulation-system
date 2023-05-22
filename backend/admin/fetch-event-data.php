@@ -11,8 +11,8 @@ $judge = new Judge();
 $criteria = new Criteria();
 
 echo json_encode([
-    'contestants' => $contestant->findBy('event_id', $event_id, 'contestant_number', 'ASC'),
-    'judges' => $judge->findBy('event_id', $event_id, 'judge_name', 'ASC'),
-    'criterias' => $criteria->findBy('event_id', $event_id, 'criteria_name', 'ASC'),
+    'contestants' => $contestant->findBy('event_id', $event_id, 'contestant_description'),
+    'judges' => $judge->findBy('event_id', $event_id, 'judge_name'),
+    'criterias' => $criteria->findBy('event_id', $event_id, 'criteria_name'),
     'event' => $e,
 ], JSON_PRETTY_PRINT);

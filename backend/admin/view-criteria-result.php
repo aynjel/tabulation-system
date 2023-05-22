@@ -52,12 +52,11 @@ try{
         }
 
         $html_table .= '<th class="text-center" colspan="2">Score</th>';
-        $html_table .= '<th class="text-center" colspan="2">Rank</th>';
+        $html_table .= '<th class="text-center" colspan="3">Rank</th>';
         $html_table .= '</tr>';
         $html_table .= '</thead>';
         $html_table .= '<tbody class="text-center">';
 
-        // sort by rank
         usort($contestants, function($a, $b) use ($score, $criteria_id, $judges){
             $total_a = 0;
             $total_b = 0;
@@ -72,7 +71,7 @@ try{
 
         $html_table .= '<tr class="text-center text-uppercase">';
         $html_table .= '<th>No.</th>';
-        $html_table .= '<th>Description</th>';
+        $html_table .= '<th>Baranggay</th>';
         $html_table .= '<th>Name</th>';
         
         foreach($judges as $j){
@@ -84,45 +83,60 @@ try{
         $html_table .= '<th>Average</th>';
         $html_table .= '<th>Total</th>';
         $html_table .= '<th>Average</th>';
+        $html_table .= '<th>No.</th>';
         $html_table .= '</tr>';
 
-        foreach($contestants as $c){
+        $rank = 0;
+        $prev_score = null;
+        $prev_rank = 1;
+
+        foreach ($contestants as $index => $c) {
             $html_table .= '<tr class="text-uppercase">';
             $html_table .= '<td>'.$c->contestant_number.'</td>';
             $html_table .= '<td>'.$c->contestant_description.'</td>';
             $html_table .= '<td style="white-space: nowrap;">'.$c->contestant_name.'</td>';
 
-            $total = 0;
+            $total_score = 0;
+            $total_score_average = 0;
+            $total_rank = 0;
+            $total_rank_average = 0;
+            
             $rank = 0;
 
-            foreach($judges as $j){
+            foreach ($judges as $j) {
+                $s = $score->GetScoreByContestantAndJudge($c->id, $j->id, $criteria_id);
+                $html_table .= '<td class="criteria-score">'.$s->score.'</td>';
+                $html_table .= '<td class="criteria-rank">'.$s->rank.'</td>';
 
-                $scores = $score->findBy('criteria_id', $criteria_id);
+                $total_score += $s->score;
+                $total_score_average += $s->score / count($judges);
+                $total_rank += $s->rank;
+                $total_rank_average += $s->rank / count($judges);
 
-                foreach($scores as $s){
-
-                    if($s->contestant_id == $c->id && $s->judge_id == $j->id){
-                        
-                        $html_table .= '<td class="criteria-score">'.$s->score.'</td>';
-                        $html_table .= '<td class="criteria-rank">'.$s->rank.'</td>';
-
-                        $total += $s->score;
-                        $rank += $s->rank;
-                    }
-                }
-
+                $rank++;
             }
+            $total_score = round($total_score, 2);
+
+            $html_table .= '<td>'.$total_score.'</td>';
+
+            $html_table .= '<td>'.number_format($total_score_average, 2).'</td>';
             
-            $html_table .= '<td class="criteria-total-score">'.$total.'</td>';
+            $html_table .= '<td>'.$total_rank.'</td>';
+            
+            $html_table .= '<td>'.number_format($total_rank_average, 2).'</td>';
 
-            $html_table .= '<td class="criteria-total-score">'.(number_format($total / count($judges), 2) * ($cri->criteria_percentage / 100)).'</td>';
-
-            $html_table .= '<td class="criteria-ranking">'.$rank.'</td>';
-
-            $html_table .= '<td class="criteria-ranking">'.(number_format($rank / count($judges), 2) * ($cri->criteria_percentage / 100)).'</td>';
-
+            if($prev_score == $total_score){
+                $html_table .= '<td>'.$prev_rank.'</td>';
+            }else{
+                $html_table .= '<td>'.($index + 1).'</td>';
+                $prev_rank = $index + 1;
+            }
+        
+            $prev_score = $total_score;
+            $rank++;
 
             $html_table .= '</tr>';
+
         }
 
         $html_table .= '</tbody>';
@@ -133,7 +147,8 @@ try{
         echo json_encode([
             'status' => 'success',
             'message' => 'Criteria result found!',
-            'html_table' => $html_table
+            'html_table' => $html_table,
+            'criteria_name' => $cri->criteria_name.' ('.$cri->criteria_percentage.'%)'
         ]);
 
     }else{

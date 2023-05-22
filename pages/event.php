@@ -124,6 +124,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                     <th scope="col">Number</th>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Baranggay</th>
+                                                    <th scope="col">Result</th>
                                                     <th scope="col">Action</th>
                                                 </tr>
                                             </thead>
@@ -151,6 +152,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Username</th>
                                                     <th scope="col">Password</th>
+                                                    <th scope="col">Result</th>
                                                     <th scope="col">Action</th>
                                                 </tr>
                                             </thead>
@@ -172,13 +174,40 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
     </div>
 </section>
 
+<div class="modal fade" id="viewOverallResultModal" tabindex="-1" aria-labelledby="addOverallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong>
+                        <span id="overall-modal-name"></span>
+                    </strong>
+
+                    <div class="text-center mx-auto d-inline" id="print-btn-Overall">
+                        <button class="btn btn-primary btn-sm" onclick="PrintOverallResult()" id="print-btn-overall">
+                        <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id='e-overall-results-table'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="viewCriteriaResultModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <strong>View Criteria Result</strong>
+                    <strong>
+                        <span id="criteria-modal-name"></span>
+                    </strong>
 
                     <div class="text-center mx-auto d-inline" id="print-btn-criteria">
                         <button class="btn btn-primary btn-sm" onclick="PrintCriteriaResult()" id="print-btn-criteria">
@@ -201,7 +230,9 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <strong>View Contestant Result</strong>
+                    <strong>
+                        <span id="contestant-modal-name"></span>
+                    </strong>
 
                     <div class="text-center mx-auto d-inline" id="print-btn-contestant">
                         <button class="btn btn-primary btn-sm" onclick="PrintContestantResult()" id="print-btn-contestant">
@@ -224,7 +255,9 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <strong>View Judge Result</strong>
+                    <strong>
+                        <span id="judge-modal-name"></span>
+                    </strong>
 
                     <div class="text-center mx-auto d-inline" id="print-btn-judge">
                         <button class="btn btn-primary btn-sm" onclick="PrintJudgeResult()" id="print-btn-judge">
@@ -240,8 +273,6 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
         </div>
     </div>
 </div>
-
-
 
 <div class="modal fade" id="addContestantModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

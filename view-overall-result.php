@@ -13,9 +13,9 @@ if(!$e || $event_id == null){header('Location: ./');}
 
 $title = ucwords(str_replace('_', ' ', $e->event_name));
 
-$user = new User();
+// $user = new User();
 
-if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
+// if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
 
 ?>
 
@@ -43,11 +43,10 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
 
 <body>
 
-    <header id="header" class="header fixed-top d-flex align-items-center justify-content-center">
+    <header id="header" class="header fixed-top d-flex align-items-center justify-content-center flex-column bg-white py-3">
 
-        <h2 class="text-center">
-            Live Result
-        </h2>
+        <h1 class='text-center text-uppercase'><?= $e->event_name; ?></h1>
+        <h3 class='text-center text-uppercase'>Overall Result - <?= $e->event_description; ?></h3>
 
     </header>
 
@@ -56,9 +55,7 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
         <div class="container-fluid">
             <div class="card my-5">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <div id="overall-result"></div>
-                    </div>
+                    <div id="e-overall-results-table"></div>
                 </div>
             </div>
         </div>
@@ -91,36 +88,12 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
     <script src="./node_modules/datatables.net/js/buttons.print.min.js"></script>
     <script src="./node_modules/datatables.net/js/buttons.html5.min.js"></script>
     <script src="./node_modules/datatables.net/js/jszip.min.js"></script>
-    <script src="./node_modules/datatables.net/js/pdfmake.min.js"></script>
 
-    <script src="./js/main.js"></script>
     <script type="text/javascript">
-        var event_id = 0;
-        var criteria_id = 0;
+        var event_id = <?= $event_id; ?>;
+        
+        function ViewOverallResult() {
 
-        function Toast(status, message) {
-            Command: toastr[status](message)
-
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
-        }
-
-        function ViewOverallResult(event_id) {
             $.ajax({
                 url: "./backend/admin/view-overall-result.php",
                 type: "POST",
@@ -128,15 +101,29 @@ if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();heade
                     event_id: event_id
                 },
                 success: function (data) {
-                    $("#overall-result").html(data);
+                    data = JSON.parse(data);
+
+                    if(data.status == 'success'){
+                        $("#e-overall-results-table").html(data.html_table);
+                    }else{
+                        $("#e-overall-results-table").html(data.message);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
                 }
             });
         }
+
         $(document).ready(function () {
-            ViewOverallResult(<?=$event_id;?>);
+
+            $("#e-overall-results-table").html(
+                '<div class="mt-5 d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary mb-5" role="status"><span class="visually-hidden">Loading...</span></div></div>' + '<p class="text-center">Tallying Overall Result...</p>' + '<p class="text-center">Please wait...</p>');
+            
+            ViewOverallResult();
 
             setInterval(function () {
-                ViewOverallResult(<?=$event_id;?>);
+                ViewOverallResult();
             }, 1000);
         });
     </script>

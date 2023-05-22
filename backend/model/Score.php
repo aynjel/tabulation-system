@@ -19,6 +19,23 @@ class Score extends Model{
         }
     }
 
+    // get ranking by criteria based on total score
+    public function GetRankingByCriteria($event_id, $criteria_id){
+        $scores = $this->findBy('event_id', $event_id);
+
+        $scores_data = [];
+
+        foreach($scores as $s){
+            if($s->criteria_id == $criteria_id){
+                array_push($scores_data, $s->score);
+            }
+        }
+
+        $rankings = $this->getRankings($scores_data);
+
+        return $rankings;
+    }
+
     public function GetJudgesWhoSubmittedScores($criteria_id){
         $scores = $this->findBy('criteria_id', $criteria_id);
 

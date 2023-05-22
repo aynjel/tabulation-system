@@ -543,6 +543,7 @@ $title = 'Judge';
                             success: function (data) {
                                 var result = JSON.parse(data);
                                 if (result.status == "success") {
+                                    $("#submit-all-score").html("Submit");
                                     $("#submit-all-score").attr("disabled", true);
                                     $("#judge-scores-modal").modal("show");
                                     GetContestants();

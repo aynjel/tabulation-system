@@ -37,8 +37,8 @@ try{
         $html_table .= '<th class="text-center">'.$jud->judge_name.'</th>';
     }
 
-    $html_table .= '<th class="text-center">Total</th>';
-    $html_table .= '<th class="text-center">Ranking</th>';
+    $html_table .= '<th class="text-center">Total Score</th>';
+    $html_table .= '<th class="text-center">Total Rank</th>';
     $html_table .= '</tr>';
     $html_table .= '</thead>';
     $html_table .= '<tbody>';
@@ -47,16 +47,24 @@ try{
         $html_table .= '<tr>';
         $html_table .= '<td>'.$cri->criteria_name.'</td>';
 
-        $total = 0;
+        $total_score = 0;
+        $total_rank = 0;
 
         foreach($judges as $jud){
-            $scr = $contestant->getScoreByJudge($jud->id, $cri->id, $contestant_id);
-            $total += $scr;
-            $rank = $contestant->getRanking($cri->id, $contestant_id);
-            $html_table .= '<td>'. $scr .'</td>';
+            $score = new Score();
+            $scr = $score->GetScoreByContestantAndJudge($contestant_id, $jud->id, $cri->id);
+
+            if($scr != null){
+                $total_score += $scr->score;
+                $total_rank += $scr->rank;
+
+                $html_table .= '<td>'. $scr->score .'</td>';
+            } else {
+                $html_table .= '<td>0</td>';
+            }
         }
-        $html_table .= '<td>'.$total.'</td>';
-        $html_table .= '<td>'.$rank.'</td>';
+        $html_table .= '<td>'.$total_score.'</td>';
+        $html_table .= '<td>'.$total_rank.'</td>';
         $html_table .= '</tr>';
     }
 
@@ -67,7 +75,8 @@ try{
     echo json_encode([
         'status' => 'success',
         'message' => 'Criteria result successfully generated.',
-        'html' => $html_table
+        'html' => $html_table,
+        'contestant_name' => $c->contestant_name. ' ('.$c->contestant_description.')',
     ]);
 } catch(Exception $e){
     echo json_encode([

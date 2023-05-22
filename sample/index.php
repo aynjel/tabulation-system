@@ -1,44 +1,77 @@
-<!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Project/PHP/PHPProject.php to edit this template
--->
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title></title>
-    </head>
-    <body>
-        <?php
-        $score=[16,11,8,2,5,16,6,8,8,16,2,2,2,1];
-        
-        rsort($score);
-        
-        $count=array_count_values($score);
-        echo "<br>";
-        $i=0;
-        $rank=0;
-        $dupctr=1;
-        for($i;$i<count($score);$i++){
-            $dup=$count[$score[$i]];           
-            if($count[$score[$i]]===1){
-                $rank++;
-                echo "SCORE: ".$score[$i]." RANK:".($rank)."<br>";   
-            }
-            else if($dup>1 && $dupctr<$dup) {
-                echo "SCORE: ".$score[$i]." RANK:".($rank+1.5)."<br>";
-                $dupctr++;
-            }
-            else{                
-                echo "SCORE: ".$score[$i]." RANK:".($rank+1.5)."<br>"; 
-                $rank+=$dup;
-                $dupctr=1;
-            }
+<?php
+
+require('./autoload.php');
+
+try{
+    // $judge_id = Input::get('judge_id');
+    // $criteria_id = Input::get('criteria_id');
+    $judge_id = 25;
+    $criteria_id = 3;
+
+    $judge = new Judge();
+
+    $j = $judge->find($judge_id);
+
+    $event = new Event();
+    
+    $e = $event->find($j->event_id);
+
+    $criteria = new Criteria();
+    
+    $cri = $criteria->find($criteria_id);
+    
+    $contestant = new Contestant();
+
+    $contestants = $contestant->findBy('event_id', $e->id);
+
+    $html_table = '<div class="table-responsive">';
+
+    $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
+    $html_table .= '<h3 class="text-center text-uppercase">'.$j->judge_name.' - Judge Scores</h3>';
+    $html_table .= '<h4 class="text-center text-uppercase">('.$cri->criteria_name.') - '.$e->event_description.'</h4>';
+
+    $html_table .= '<table class="table table-bordered table-hover table-striped table-sm text-center align-middle" style="width: 100%; font-size: 12px;" id="judge-result-table">';
+    $html_table .= '<thead>';
+    $html_table .= '<tr class="text-uppercase">';
+    $html_table .= '<th class="text-center">No.</th>';
+    $html_table .= '<th class="text-center">Baranggay</th>';
+    $html_table .= '<th class="text-center">Name</th>';
+
+    $html_table .= '<th class="text-center">Score</th>';
+    $html_table .= '<th class="text-center">Ranking</th>';
+    $html_table .= '</tr>';
+    $html_table .= '</thead>';
+    $html_table .= '<tbody>';
+    
+    foreach ($contestants as $key => $c) {
+        $html_table .= '<tr>';
+        $html_table .= '<td>'.($key + 1).'</td>';
+        $html_table .= '<td>'.$c->contestant_description.'</td>';
+        $html_table .= '<td>'.$c->contestant_name.'</td>';
+
+        $sc = new Score();
+
+        $scr = $sc->GetScoreByContestantAndJudge($c->id, $judge_id, $criteria_id);
+
+        if($scr != null){
+            $html_table .= '<td>'.$scr->score.'</td>';
+            $html_table .= '<td>'.$scr->rank.'</td>';
+        } else {
+            $html_table .= '<td>0</td>';
+            $html_table .= '<td>0</td>';
         }
-        
-        
-        
-        
-        ?>
-    </body>
-</html>
+
+        $html_table .= '</tr>';
+    }
+
+    $html_table .= '</tbody>';
+    $html_table .= '</table>';
+    $html_table .= '</div>';
+
+    echo $html_table;
+} catch(Exception $e){
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
+}
