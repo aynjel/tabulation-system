@@ -50,7 +50,32 @@ class Contestant extends Model{
 
         return [
             'score' => $total_s,
-            'rank' => $total_r
+            'rank' => $total_r,
+        ];
+    }
+
+    public function GetAverageByCriteria($criteria_id, $contestant_id){
+        $judge = new Judge();
+
+        $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
+
+        $score = new Score();
+
+        $scores = $score->findBy('criteria_id', $criteria_id);
+
+        $total_score_average = 0;
+        $total_rank_average = 0;
+
+        foreach($scores as $s){
+            if($s->contestant_id == $contestant_id){
+                $total_score_average += $s->score;
+                $total_rank_average += $s->rank;
+            }
+        }
+
+        return [
+            'score' => $total_score_average / count($judges),
+            'rank' => $total_rank_average / count($judges)
         ];
     }
 

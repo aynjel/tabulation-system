@@ -89,24 +89,31 @@ foreach ($contestants as $key => $c) {
     $total_score = 0;
     $total_rank = 0;
 
+    $total_score_average = 0;
+    $total_rank_average = 0;
+
     foreach ($criterias as $cri) {
 
         $scr = $contestant->GetTotalByCriteria($cri->id, $c->id)['score'];
         $rnk = $contestant->GetTotalByCriteria($cri->id, $c->id)['rank'];
-        
-        $html .= "<td>".$scr."</td>";
-        $html .= "<td>".$rnk."</td>";
 
-        $total_score += $scr;
-        $total_rank += $rnk;
+        $tscr = $contestant->GetAverageByCriteria($cri->id, $c->id)['score'];
+        $trnk = $contestant->GetAverageByCriteria($cri->id, $c->id)['rank'];
+        
+        $total_score += $tscr;
+        $total_rank += $trnk;
+        
+        $html .= "<td>".$total_score_average."</td>";
+        $html .= "<td>".$total_rank_average."</td>";
+
     }
 
     $html .= "<td>" . $total_score . "</td>";
-    $html .= "<td>" . number_format($total_score / count($criterias), 2) . "</td>";
+    $html .= "<td>" . number_format($total_score_average / count($criterias), 2) . "</td>";
     $html .= "<td>" . $total_rank . "</td>";
-    $html .= "<td>" . number_format($total_rank / count($criterias), 2) . "</td>";
+    $html .= "<td>" . number_format($total_rank_average / count($criterias), 2) . "</td>";
 
-    if($prev_score == $total_score){
+    if($prev_score == $total_score_average){
         $html .= '<td>'.$prev_rank.'</td>';
     }else{
         $html .= '<td>'.($key + 1).'</td>';
