@@ -111,7 +111,7 @@ foreach ($contestants as $key => $c) {
 
     }
 
-    $total_score_average = number_format($total_score / count($criterias), 2);
+    $total_score_average = round(number_format($total_score / count($criterias), 2), 2);
 
     $html .= "<td>" . $total_score . "</td>";
     $html .= "<td>" . $total_score_average . "</td>";

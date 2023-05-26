@@ -12,6 +12,22 @@ class Judge extends Model{
         return $this->all();
     }
 
+    public function GetJudgesWhoSubmittedScores($criteria_id){
+        $score = new Score();
+        $scores = $score->findBy('criteria_id', $criteria_id);
+
+        $judges = [];
+
+        foreach($scores as $s){
+            $judge = $this->find($s->judge_id);
+            if(!in_array($judge, $judges)){
+                array_push($judges, $judge);
+            }
+        }
+
+        return $judges;
+    }
+
     // login judge
     public function login($username, $password){
         $judge = $this->findBy('judge_username', $username);

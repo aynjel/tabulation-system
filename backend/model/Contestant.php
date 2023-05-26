@@ -60,7 +60,11 @@ class Contestant extends Model{
         // $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
         
         // get judges that have scores for this criteria
-        $judges = $judge->GetJudgesWithScores($criteria_id);
+        if($judge->GetJudgesWithScores($criteria_id)){
+            $judges = $judge->GetJudgesWithScores($criteria_id);
+        }else{
+            $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
+        }
 
         $score = new Score();
 
