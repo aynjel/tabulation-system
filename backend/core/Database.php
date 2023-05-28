@@ -46,6 +46,10 @@ class Database{
         return $this->_lastInsertId;
     }
 
+    public function rowCount(){
+        return $this->_query->rowCount();
+    }
+
     public function error(){
         return $this->_error;
     }

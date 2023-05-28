@@ -64,14 +64,14 @@ $html .= "</tr>";
 $html .= "</thead>";
 $html .= "<tbody>";
 
-// sort by total score
+// sort by total score average
 usort($contestants, function ($a, $b) use ($criterias, $contestant) {
     $total_a = 0;
     $total_b = 0;
 
-    foreach ($criterias as $criteria) {
-        $total_a += $contestant->GetTotalByCriteria($criteria->id, $a->id)['score'];
-        $total_b += $contestant->GetTotalByCriteria($criteria->id, $b->id)['score'];
+    foreach ($criterias as $cri) {
+        $total_a += $contestant->GetAverageByCriteria($cri->id, $a->id)['score'];
+        $total_b += $contestant->GetAverageByCriteria($cri->id, $b->id)['score'];
     }
 
     return $total_b <=> $total_a;
@@ -89,24 +89,36 @@ foreach ($contestants as $key => $c) {
     $total_score = 0;
     $total_rank = 0;
 
+    // $total_score_average = 0;
+    // $total_rank_average = 0;
+
     foreach ($criterias as $cri) {
 
         $scr = $contestant->GetTotalByCriteria($cri->id, $c->id)['score'];
         $rnk = $contestant->GetTotalByCriteria($cri->id, $c->id)['rank'];
-        
-        $html .= "<td>".$scr."</td>";
-        $html .= "<td>".$rnk."</td>";
 
-        $total_score += $scr;
-        $total_rank += $rnk;
+        $tscr = round($contestant->GetAverageByCriteria($cri->id, $c->id)['score'], 2);
+        $trnk = round($contestant->GetAverageByCriteria($cri->id, $c->id)['rank'], 2);
+
+        $total_score += $tscr;
+        $total_rank += $trnk;
+        
+        // $total_score_average += $tscr;
+        // $total_rank_average += $trnk;
+        
+        $html .= "<td>".$tscr."</td>";
+        $html .= "<td>".$trnk."</td>";
+
     }
 
+    $total_score_average = round(number_format($total_score / count($criterias), 2), 2);
+
     $html .= "<td>" . $total_score . "</td>";
-    $html .= "<td>" . number_format($total_score / count($criterias), 2) . "</td>";
+    $html .= "<td>" . $total_score_average . "</td>";
     $html .= "<td>" . $total_rank . "</td>";
     $html .= "<td>" . number_format($total_rank / count($criterias), 2) . "</td>";
 
-    if($prev_score == $total_score){
+    if($prev_score == $total_score_average){
         $html .= '<td>'.$prev_rank.'</td>';
     }else{
         $html .= '<td>'.($key + 1).'</td>';

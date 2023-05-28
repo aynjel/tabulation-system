@@ -98,7 +98,7 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
         function ViewOverallResult() {
 
             $.ajax({
-                url: "./backend/admin/view-overall-result.php",
+                url: "./backend/admin/view-overall-result_.php",
                 type: "POST",
                 data: {
                     event_id: event_id
@@ -132,9 +132,9 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
             
             ViewOverallResult();
 
-            setInterval(function () {
-                ViewOverallResult();
-            }, 1000);
+            // setInterval(function () {
+            //     ViewOverallResult();
+            // }, 1000);
 
         });
     </script>
