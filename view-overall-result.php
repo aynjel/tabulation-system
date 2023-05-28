@@ -118,8 +118,7 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
 
             document.body.innerHTML = printContents;
 
-            // hide print button in print preview
-            $(".card-header").hide();
+            $(".card-header").hide()
 
             window.print();
 
