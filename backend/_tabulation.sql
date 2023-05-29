@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 29, 2023 at 06:29 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Generation Time: May 22, 2023 at 05:50 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -153,7 +153,9 @@ INSERT INTO `criteria` (`id`, `criteria_name`, `criteria_percentage`, `event_id`
 (6, 'Evening Gown', '100', 38, 'false'),
 (7, 'Q and A', '100', 38, 'false'),
 (8, 'Costume Designer', '100', 39, 'false'),
-(58, 'Swimsuit', '100', 38, 'false');
+(58, 'Swimsuit', '100', 38, 'false'),
+(59, 'Criteria 1', '100', 40, 'false'),
+(60, 'Criteria 2', '100', 40, 'false');
 
 -- --------------------------------------------------------
 
@@ -177,7 +179,7 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `event_name`, `event_description`, `event_date`, `event_time`, `event_venue`, `created_at`, `is_start`) VALUES
-(38, 'Binibining Toledo 2023', 'Preliminary Competition', '2023-05-06', '07:00', 'Toledo City Megadome', '2023-05-06 03:43:25', 'true'),
+(38, 'Binibining Toledo 2023', 'Preliminary Competition', '2023-05-06', '07:00', 'Toledo City Megadome', '2023-05-06 03:43:25', 'false'),
 (39, 'Binibining Toledo 2023 - Costume Designer', 'Costume Designer Competition', '2023-05-06', '08:00', 'Toledo City Megadome', '2023-05-06 06:51:19', 'false');
 
 -- --------------------------------------------------------
@@ -880,6 +882,19 @@ INSERT INTO `scores` (`id`, `event_id`, `judge_id`, `criteria_id`, `contestant_i
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sub_criteria`
+--
+
+CREATE TABLE `sub_criteria` (
+  `id` int(11) NOT NULL,
+  `subcriteria_name` text NOT NULL,
+  `criteria_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -897,7 +912,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `username`, `password`) VALUES
-(1, 'Admin', '', '', 'admin', 'admin');
+(1, 'John', 'Doe', 'Smith', 'admin', 'admin');
 
 --
 -- Indexes for dumped tables
@@ -931,6 +946,12 @@ ALTER TABLE `judges`
 -- Indexes for table `scores`
 --
 ALTER TABLE `scores`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `sub_criteria`
+--
+ALTER TABLE `sub_criteria`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -973,6 +994,12 @@ ALTER TABLE `judges`
 --
 ALTER TABLE `scores`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1914;
+
+--
+-- AUTO_INCREMENT for table `sub_criteria`
+--
+ALTER TABLE `sub_criteria`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
