@@ -3,19 +3,9 @@ require('./autoload.php');
 
 date_default_timezone_set('Asia/Manila');
 
-$event = new Event();
+$user = new User();
 
-$event_id = Input::get('event_id');
-
-$e = $event->find($event_id);
-
-if(!$e || $event_id == null){header('Location: ./');}
-
-$title = ucwords(str_replace('_', ' ', $e->event_name));
-
-// $user = new User();
-
-// if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
+if(!$user->isLoggedIn() || Input::get('page') == 'logout'){$user->logout();header('Location: ./auth/login.php');}
 
 ?>
 
@@ -27,7 +17,7 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        <?= $title; ?> | Live Result
+    <?= Config::get('website/name'); ?> | Overall Result
     </title>
 
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -91,53 +81,7 @@ $title = ucwords(str_replace('_', ' ', $e->event_name));
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./node_modules/toastr/build/toastr.min.js"></script>
     <script src="./node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-
-    <script type="text/javascript">
-        var event_id = <?= $event_id; ?>;
-        
-        function ViewOverallResult() {
-
-            $.ajax({
-                url: "./backend/admin/view-overall-result_.php",
-                type: "POST",
-                data: {
-                    event_id: event_id
-                },
-                success: function (data) {
-                    $("#e-overall-results-table").html(data);
-                },
-                error: function (data) {
-                    console.log(data);
-                }
-            });
-        }
-
-        function PrintResult(){
-            var printContents = document.getElementById("e-overall-results-table").innerHTML;
-            var originalContents = document.body.innerHTML;
-
-            document.body.innerHTML = printContents;
-
-            $(".card-header").hide()
-
-            window.print();
-
-            document.body.innerHTML = originalContents;
-        }
-
-        $(document).ready(function () {
-
-            $("#e-overall-results-table").html(
-                '<div class="mt-5 d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary mb-5" role="status"><span class="visually-hidden">Loading...</span></div></div>' + '<p class="text-center">Tallying Overall Result...</p>' + '<p class="text-center">Please wait...</p>');
-            
-            ViewOverallResult();
-
-            // setInterval(function () {
-            //     ViewOverallResult();
-            // }, 1000);
-
-        });
-    </script>
+    <script src="./js/overall.js"></script>
 
 </body>
 

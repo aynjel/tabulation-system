@@ -30,7 +30,7 @@ $html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' 
 $html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
 $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
-$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 14px;' id='overall-result-table'>";
+$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table'>";
 $html .= "<thead>";
 
 $html .= "<tr class='text-uppercase text-center'>";
@@ -40,8 +40,8 @@ foreach ($criterias as $criteria) {
     $html .= "<th colspan='2'>" . $criteria->criteria_name . "</th>";
 }
 
-$html .= "<th colspan='2'>Score</th>";
-$html .= "<th colspan='3'>Rank</th>";
+$html .= "<th colspan='2'>Overall Total</th>";
+$html .= "<th rowspan='2'>Ranking</th>";
 $html .= "</tr>";
 
 $html .= "<tr class='text-center'>";
@@ -54,11 +54,8 @@ foreach ($criterias as $criteria) {
     $html .= "<th>Rank</th>";
 }
 
-$html .= "<th>Total</th>";
-$html .= "<th>Average</th>";
-$html .= "<th>Total</th>";
-$html .= "<th>Average</th>";
-$html .= "<th>No.</th>";
+$html .= "<th>Score</th>";
+$html .= "<th>Rank</th>";
 $html .= "</tr>";
 
 $html .= "</thead>";
@@ -70,8 +67,8 @@ usort($contestants, function ($a, $b) use ($criterias, $contestant) {
     $total_b = 0;
 
     foreach ($criterias as $cri) {
-        $total_a += $contestant->GetAverageByCriteria($cri->id, $a->id)['score'];
-        $total_b += $contestant->GetAverageByCriteria($cri->id, $b->id)['score'];
+        $total_a += $contestant->GetTotalByCriteria($cri->id, $a->id)['score'];
+        $total_b += $contestant->GetTotalByCriteria($cri->id, $b->id)['score'];
     }
 
     return $total_b <=> $total_a;
@@ -79,6 +76,7 @@ usort($contestants, function ($a, $b) use ($criterias, $contestant) {
 
 $prev_score = null;
 $prev_rank = 1;
+$prev_total_rank = 1;
 
 foreach ($contestants as $key => $c) {
     $html .= "<tr class='text-center'>";
@@ -89,41 +87,42 @@ foreach ($contestants as $key => $c) {
     $total_score = 0;
     $total_rank = 0;
 
-    // $total_score_average = 0;
-    // $total_rank_average = 0;
-
     foreach ($criterias as $cri) {
 
         $scr = $contestant->GetTotalByCriteria($cri->id, $c->id)['score'];
         $rnk = $contestant->GetTotalByCriteria($cri->id, $c->id)['rank'];
 
-        $tscr = round($contestant->GetAverageByCriteria($cri->id, $c->id)['score'], 2);
-        $trnk = round($contestant->GetAverageByCriteria($cri->id, $c->id)['rank'], 2);
-
-        $total_score += $tscr;
-        $total_rank += $trnk;
+        $total_score += $scr;
+        $total_rank += $rnk;
         
-        // $total_score_average += $tscr;
-        // $total_rank_average += $trnk;
-        
-        $html .= "<td>".$tscr."</td>";
-        $html .= "<td>".$trnk."</td>";
+        $html .= "<td>".$scr."</td>";
+        $html .= "<td>".$rnk."</td>";
 
     }
 
-    $total_score_average = round(number_format($total_score / count($criterias), 2), 2);
-
     $html .= "<td>" . $total_score . "</td>";
-    $html .= "<td>" . $total_score_average . "</td>";
     $html .= "<td>" . $total_rank . "</td>";
-    $html .= "<td>" . number_format($total_rank / count($criterias), 2) . "</td>";
 
-    if($prev_score == $total_score_average){
-        $html .= '<td>'.$prev_rank.'</td>';
+    $total_score = round($total_score, 2);
+
+    if($prev_score == $total_score){
+        if($prev_total_rank == $total_rank){
+            $html .= '<td>'.$prev_rank.'</td>';
+        }elseif($prev_total_rank < $total_rank){
+            $html .= '<td>'.($key + 1).'</td>';
+            $prev_rank = $key + 1;
+        }elseif($prev_total_rank > $total_rank){
+            $html .= '<td>'.($key).' - Rank Win</td>';
+        }else{
+            $html .= '<td>'.$prev_rank.'</td>';
+        }
     }else{
         $html .= '<td>'.($key + 1).'</td>';
         $prev_rank = $key + 1;
     }
+
+    $prev_score = $total_score;
+    $prev_total_rank = $total_rank;
 
     $html .= "</tr>";
 }

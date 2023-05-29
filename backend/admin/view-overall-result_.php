@@ -17,21 +17,15 @@
                     <th colspan="3">Contestant</th>
                     <th colspan="2">Criteria 1</th>
                     <th colspan="2">Criteria 2</th>
-                    <th colspan="2">Score</th>
-                    <th rowspan="3">Rank</th>
+                    <th colspan="2">Overall Total</th>
+                    <th rowspan="2">Ranking</th>
                 </tr>
                 <tr>
-                    <th rowspan="2">No.</th>
-                    <th rowspan="2">Name</th>
-                    <th rowspan="2">Baraggay</th>
-                    <th>Judge 1</th>
-                    <th>Judge 2</th>
-                    <th>Judge 1</th>
-                    <th>Judge 2</th>
-                    <th rowspan="2">Total</th>
-                    <th rowspan="2">Average</th>
-                </tr>
-                <tr>
+                    <th>No.</th>
+                    <th>Name</th>
+                    <th>Baraggay</th>
+                    <th>Score</th>
+                    <th>Rank</th>
                     <th>Score</th>
                     <th>Rank</th>
                     <th>Score</th>
@@ -50,6 +44,16 @@
                     <td>30</td>
                     <td>30</td>
                     <td>30</td>
+                </tr>
+                <tr>
+                    <td>John</td>
+                    <td>Doe</td>
+                    <td>30</td>
+                    <td>30</td>
+                    <td>30</td>
+                    <td>30</td>
+                    <td>30</td>
+                    <td>30</td>
                     <td>30</td>
                 </tr>
                 <tr>
@@ -62,7 +66,6 @@
                     <td>30</td>
                     <td>30</td>
                     <td>30</td>
-                    <td>30</td>
                 </tr>
                 <tr>
                     <td>John</td>
@@ -72,19 +75,14 @@
                     <td>30</td>
                     <td>30</td>
                     <td>30</td>
-                </tr>
-                <tr>
-                    <td>John</td>
-                    <td>Doe</td>
-                    <td>30</td>
-                    <td>30</td>
-                    <td>30</td>
                     <td>30</td>
                     <td>30</td>
                 </tr>
                 <tr>
                     <td>John</td>
                     <td>Doe</td>
+                    <td>30</td>
+                    <td>30</td>
                     <td>30</td>
                     <td>30</td>
                     <td>30</td>
