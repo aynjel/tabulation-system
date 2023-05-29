@@ -3,7 +3,7 @@
 require('./autoload.php');
 
 $event_id = Input::get('event_id');
-// $event_id = 38;
+// $event_id = 41;
 
 $event = new Event();
 
@@ -30,7 +30,7 @@ $html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' 
 $html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
 $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
-$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table'>";
+$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table' border='1'>";
 $html .= "<thead>";
 
 $html .= "<tr class='text-uppercase text-center'>";
@@ -46,7 +46,7 @@ $html .= "</tr>";
 
 $html .= "<tr class='text-center'>";
 $html .= "<th>No.</th>";
-$html .= "<th>Baranggay</th>";
+$html .= "<th>Contingent</th>";
 $html .= "<th>Name</th>";
 
 foreach ($criterias as $criteria) {
@@ -109,7 +109,7 @@ foreach ($contestants as $key => $c) {
         if($prev_total_rank == $total_rank){
             $html .= '<td>'.$prev_rank.'</td>';
         }elseif($prev_total_rank < $total_rank){
-            $html .= '<td>'.($key + 1).'</td>';
+            $html .= '<td>'.($key + 1).' - Rank Lose</td>';
             $prev_rank = $key + 1;
         }elseif($prev_total_rank > $total_rank){
             $html .= '<td>'.($key).' - Rank Win</td>';

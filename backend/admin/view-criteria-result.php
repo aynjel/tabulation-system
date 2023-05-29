@@ -20,8 +20,6 @@ try{
     
     $judge = new Judge();
 
-    // get judges who submitted scores
-
     $score = new Score();
 
     $judge_scores = $score->GetJudgesWhoSubmittedScores($criteria_id);
@@ -86,11 +84,11 @@ try{
         $html_table .= '<th>No.</th>';
         $html_table .= '</tr>';
 
-        $rank = 0;
         $prev_score = null;
         $prev_rank = 1;
+        $prev_total_rank = 1;
 
-        foreach ($contestants as $index => $c) {
+        foreach ($contestants as $key => $c) {
             $html_table .= '<tr class="text-uppercase">';
             $html_table .= '<td>'.$c->contestant_number.'</td>';
             $html_table .= '<td>'.$c->contestant_description.'</td>';
@@ -113,8 +111,8 @@ try{
                 $total_rank += $s->rank;
                 $total_rank_average += $s->rank / count($judges);
 
-                $rank++;
             }
+            
             $total_score = round($total_score, 2);
 
             $html_table .= '<td>'.$total_score.'</td>';
@@ -126,14 +124,23 @@ try{
             $html_table .= '<td>'.number_format($total_rank_average, 2).'</td>';
 
             if($prev_score == $total_score){
-                $html_table .= '<td>'.$prev_rank.'</td>';
+                if($prev_total_rank == $total_rank){
+                    $html_table .= '<td>'.$prev_rank.'</td>';
+                }elseif($prev_total_rank < $total_rank){
+                    $html_table .= '<td>'.($key + 1).' - Rank Lose</td>';
+                    $prev_rank = $key + 1;
+                }elseif($prev_total_rank > $total_rank){
+                    $html_table .= '<td>'.($key).' - Rank Win</td>';
+                }else{
+                    $html_table .= '<td>'.$prev_rank.'</td>';
+                }
             }else{
-                $html_table .= '<td>'.($index + 1).'</td>';
-                $prev_rank = $index + 1;
+                $html_table .= '<td>'.($key + 1).'</td>';
+                $prev_rank = $key + 1;
             }
         
             $prev_score = $total_score;
-            $rank++;
+            $prev_total_rank = $total_rank;
 
             $html_table .= '</tr>';
 
@@ -150,6 +157,8 @@ try{
             'html_table' => $html_table,
             'criteria_name' => $cri->criteria_name.' ('.$cri->criteria_percentage.'%)'
         ]);
+
+        // echo $html_table;
 
     }else{
         echo json_encode([

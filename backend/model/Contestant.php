@@ -41,7 +41,7 @@ class Contestant extends Model{
         $total_s = 0;
         $total_r = 0;
 
-        foreach($scores as $s){
+        foreach($scores as $key => $s){
             if($s->contestant_id == $contestant_id){
                 $total_s += $s->score;
                 $total_r += $s->rank;

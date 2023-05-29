@@ -329,7 +329,6 @@ function ViewCriteriaResult(criteria_id) {
             Swal.showLoading();
         },
     });
-    setTimeout(function () {
         $.ajax({
             url: "./backend/admin/view-criteria-result.php",
             type: "POST",
@@ -359,7 +358,6 @@ function ViewCriteriaResult(criteria_id) {
                 Swal.close();
             }
         });
-    }, 500);
 }
 
 function PrintCriteriaResult(){
@@ -853,7 +851,7 @@ function DeleteContestant(id) {
                     var obj = JSON.parse(data);
                     if (obj.status == "success") {
                         Toast(obj.status, obj.message);
-                        FetchEventData( event_id );
+                        FetchEventData(event_id);
                     } else {
                         Toast(obj.status, obj.message);
                     }
@@ -991,7 +989,7 @@ $(document).ready(function () {
 
                 if (obj.status == 'success') {
                     $("#form-add-contestant")[0].reset();
-                    FetchEventData( event_id );
+                    // FetchEventData(event_id);
                     Toast(obj.status, obj.message);
                 } else {
                     Toast(obj.status, obj.message);
