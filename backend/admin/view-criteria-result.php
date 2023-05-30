@@ -117,11 +117,11 @@ try{
 
             $html_table .= '<td>'.$total_score.'</td>';
 
-            $html_table .= '<td>'.number_format($total_score_average, 2).'</td>';
+            $html_table .= '<td>'.round($total_score_average, 2).'</td>';
             
             $html_table .= '<td>'.$total_rank.'</td>';
             
-            $html_table .= '<td>'.number_format($total_rank_average, 2).'</td>';
+            $html_table .= '<td>'.round($total_rank_average, 2).'</td>';
 
             if($prev_score == $total_score){
                 if($prev_total_rank == $total_rank){

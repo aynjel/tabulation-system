@@ -46,6 +46,8 @@ class Contestant extends Model{
                 $total_s += $s->score;
                 $total_r += $s->rank;
             }
+
+            $total_s = round($total_s, 2);
         }
 
         return [
@@ -57,9 +59,6 @@ class Contestant extends Model{
     public function GetAverageByCriteria($criteria_id, $contestant_id){
         $judge = new Judge();
 
-        // $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
-        
-        // get judges that have scores for this criteria
         if($judge->GetJudgesWithScores($criteria_id)){
             $judges = $judge->GetJudgesWithScores($criteria_id);
         }else{
@@ -73,7 +72,7 @@ class Contestant extends Model{
         $total_score_average = 0;
         $total_rank_average = 0;
 
-        foreach($scores as $s){
+        foreach($scores as $key => $s){
             if($s->contestant_id == $contestant_id){
                 $total_score_average += $s->score;
                 $total_rank_average += $s->rank;
@@ -81,9 +80,49 @@ class Contestant extends Model{
         }
 
         return [
-            'score' => $total_score_average / count($judges),
-            'rank' => $total_rank_average / count($judges)
+            'score' => round($total_score_average / count($judges), 2),
+            'rank' => round($total_rank_average / count($judges), 2),
         ];
+    }
+
+    public function GetRankByCriteria($criteria_id, $contestant_id){
+        $contestants = $this->findBy('event_id', $this->find($contestant_id)->event_id);
+
+        $contestant_score = $this->GetAverageByCriteria($criteria_id, $contestant_id);
+
+        $ranking = 1;
+
+        foreach($contestants as $c){
+            if($c->id != $contestant_id){
+                if($this->GetAverageByCriteria($criteria_id, $c->id) > $contestant_score){
+                    if($this->GetAverageByCriteria($criteria_id, $c->id) == $contestant_score){
+                        $ranking++;
+                    }
+                }
+            }
+        }
+
+        return $ranking;
+    }
+
+    public function GetRankByTotal($contestant_id){
+        $contestants = $this->findBy('event_id', $this->find($contestant_id)->event_id);
+
+        $contestant_score = $this->GetTotalScore($contestant_id);
+
+        $ranking = 1;
+
+        foreach($contestants as $c){
+            if($c->id != $contestant_id){
+                if($this->GetTotalScore($c->id) > $contestant_score){
+                    if($this->GetTotalScore($c->id) == $contestant_score){
+                        $ranking++;
+                    }
+                }
+            }
+        }
+
+        return $ranking;
     }
 
     public function getTotalScore($contestant_id){

@@ -3,7 +3,7 @@
 require('./autoload.php');
 
 $event_id = Input::get('event_id');
-// $event_id = 41;
+// $event_id = 38;
 
 $event = new Event();
 
@@ -30,7 +30,7 @@ $html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' 
 $html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
 $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
-$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table' border='1'>";
+$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table'>";
 $html .= "<thead>";
 
 $html .= "<tr class='text-uppercase text-center'>";
@@ -40,13 +40,13 @@ foreach ($criterias as $criteria) {
     $html .= "<th colspan='2'>" . $criteria->criteria_name . "</th>";
 }
 
-$html .= "<th colspan='2'>Overall Total</th>";
+$html .= "<th colspan='2'>Overall</th>";
 $html .= "<th rowspan='2'>Ranking</th>";
 $html .= "</tr>";
 
 $html .= "<tr class='text-center'>";
 $html .= "<th>No.</th>";
-$html .= "<th>Contingent</th>";
+$html .= "<th>Baranggay</th>";
 $html .= "<th>Name</th>";
 
 foreach ($criterias as $criteria) {
@@ -54,8 +54,8 @@ foreach ($criterias as $criteria) {
     $html .= "<th>Rank</th>";
 }
 
-$html .= "<th>Score</th>";
-$html .= "<th>Rank</th>";
+$html .= "<th>Total Score</th>";
+$html .= "<th>Total Rank</th>";
 $html .= "</tr>";
 
 $html .= "</thead>";
@@ -89,21 +89,20 @@ foreach ($contestants as $key => $c) {
 
     foreach ($criterias as $cri) {
 
-        $scr = $contestant->GetTotalByCriteria($cri->id, $c->id)['score'];
-        $rnk = $contestant->GetTotalByCriteria($cri->id, $c->id)['rank'];
+        $res = $contestant->GetAverageByCriteria($cri->id, $c->id);
 
-        $total_score += $scr;
-        $total_rank += $rnk;
+        $total_score += $res['score'];
+        $total_rank += $res['rank'];
         
-        $html .= "<td>".$scr."</td>";
-        $html .= "<td>".$rnk."</td>";
+        $html .= "<td>" . $res['score'] . "</td>";
+        $html .= "<td>" . $res['rank'] . "</td>";
 
     }
+    
+    $total_score = round($total_score, 2);
 
     $html .= "<td>" . $total_score . "</td>";
     $html .= "<td>" . $total_rank . "</td>";
-
-    $total_score = round($total_score, 2);
 
     if($prev_score == $total_score){
         if($prev_total_rank == $total_rank){
