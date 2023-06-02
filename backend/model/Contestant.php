@@ -57,17 +57,19 @@ class Contestant extends Model{
     }
 
     public function GetAverageByCriteria($criteria_id, $contestant_id){
-        $judge = new Judge();
 
-        if($judge->GetJudgesWithScores($criteria_id)){
-            $judges = $judge->GetJudgesWithScores($criteria_id);
+        $criteria = new Criteria();
+        $cri = $criteria->find($criteria_id);
+
+        $judge = new Judge();
+        if($judge->GetJudgesWithScores($cri->id)){
+            $judges = $judge->GetJudgesWithScores($cri->id);
         }else{
             $judges = $judge->findBy('event_id', $this->find($contestant_id)->event_id);
         }
 
         $score = new Score();
-
-        $scores = $score->findBy('criteria_id', $criteria_id);
+        $scores = $score->findBy('criteria_id', $cri->id);
 
         $total_score_average = 0;
         $total_rank_average = 0;
@@ -79,10 +81,17 @@ class Contestant extends Model{
             }
         }
 
-        return [
-            'score' => round($total_score_average / count($judges), 2),
-            'rank' => round($total_rank_average / count($judges), 2),
-        ];
+        if($scores){
+            return [
+                'score' => round($total_score_average / count($judges), 2),
+                'rank' => round($total_rank_average / count($judges), 2),
+            ];
+        }else{
+            return [
+                'score' => 0,
+                'rank' => 0,
+            ];
+        }
     }
 
     public function GetRankByCriteria($criteria_id, $contestant_id){

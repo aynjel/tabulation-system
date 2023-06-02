@@ -1,22 +1,22 @@
 <?php
 
-require('./autoload.php');
+require './autoload.php';
 
-$criteria = new Criteria();
-
+$event_id = Input::get('event_id');
 $criteria_id = Input::get('criteria_id');
 
-$find_is_show_true = $criteria->findBy('is_show', 'true');
-// update criteria where is_show = true
-foreach($find_is_show_true as $is_show_true){
-    $criteria->update($is_show_true->id, [
-        'is_show' => 'false'
-    ]);
-}
+$event = new Event();
+$criteria = new Criteria();
 
+// Update all criteria of the event to 'is_show' = 'false'
+$criteria->updateByEventId($event_id, ['is_show' => 'false']);
+
+// Update the specified criteria to 'is_show' = 'true'
 $criteria->update($criteria_id, ['is_show' => 'true']);
 
-echo json_encode([
-    'status' => 'success',
-    'message' => 'Criteria is now showed'
-]);
+$response = [
+  'status' => 'success',
+  'message' => 'Criteria is now shown'
+];
+
+echo json_encode($response);

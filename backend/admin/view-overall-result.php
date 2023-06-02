@@ -3,7 +3,6 @@
 require('./autoload.php');
 
 $event_id = Input::get('event_id');
-// $event_id = 38;
 
 $event = new Event();
 
@@ -37,7 +36,7 @@ $html .= "<tr class='text-uppercase text-center'>";
 $html .= "<th colspan='3'>Contestant</th>";
 
 foreach ($criterias as $criteria) {
-    $html .= "<th colspan='2'>" . $criteria->criteria_name . "</th>";
+    $html .= "<th colspan='2'>" . $criteria->criteria_name . " (". $criteria->criteria_percentage .")% </th>";
 }
 
 $html .= "<th colspan='2'>Overall</th>";
@@ -86,12 +85,13 @@ foreach ($contestants as $key => $c) {
 
     $total_score = 0;
     $total_rank = 0;
+    $total_scr = 0;
 
     foreach ($criterias as $cri) {
 
         $res = $contestant->GetAverageByCriteria($cri->id, $c->id);
 
-        $total_score += $res['score'];
+        $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
         $total_rank += $res['rank'];
         
         $html .= "<td>" . $res['score'] . "</td>";
@@ -99,7 +99,7 @@ foreach ($contestants as $key => $c) {
 
     }
     
-    $total_score = round($total_score, 2);
+    // $total_s = round($total_scr, 2);
 
     $html .= "<td>" . $total_score . "</td>";
     $html .= "<td>" . $total_rank . "</td>";

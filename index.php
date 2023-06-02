@@ -645,7 +645,8 @@ $title = ucwords(str_replace('-', ' ', $page));
                 url: "./backend/admin/show-criteria.php",
                 type: "POST",
                 data: {
-                    criteria_id: id
+                    criteria_id: id,
+                    event_id: event_id
                 },
                 success: function (data) {
                     data = JSON.parse(data);

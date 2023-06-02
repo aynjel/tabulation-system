@@ -1,18 +1,14 @@
 <?php
 
-require('./autoload.php');
+require './autoload.php';
 
+$event_id = Input::get('event_id');
+
+$event = new Event();
 $criteria = new Criteria();
 
-$criteria_id = Input::get('control_criteria_id');
+$showedCriteria = $criteria->findShowedCriteria($event_id);
 
-// get current showed criteria
-$scs = $criteria->findBy('is_show', 'true');
-
-if(count($scs) > 0){
-    foreach($scs as $sc){
-        echo $sc->criteria_name . ' ' . '(' . $sc->criteria_percentage . '%)' . '<br>';
-    }
-}else{
-    return false;
+foreach ($showedCriteria as $criteria) {
+    echo "{$criteria->criteria_name} ({$criteria->criteria_percentage}%)<br>";
 }
