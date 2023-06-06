@@ -98,6 +98,7 @@ $title = 'Judge';
 
                             <h3 class="card-text">
                                 <span class="text-uppercase criteria-name"></span>
+                                <span class="criteria-percentage"></span>
                             </h3>
                         </div>
 
@@ -109,9 +110,9 @@ $title = 'Judge';
                                     <thead>
                                         <tr>
                                             <th scope="col" class="text-center">Number</th>
-                                            <th scope="col" class="text-center">Baranggay</th>
-                                            <th scope="col" class="text-center">Name</th>
-                                            <th scope="col" class="text-center">Score (1 - 10)</th>
+                                            <th scope="col" class="text-center">Description</th>
+                                            <th scope="col" class="text-center">Contingent</th>
+                                            <th scope="col" class="text-center">Score (1 - <span class="criteria-percentage"></span>)</th>
                                             <th scope="col" class="text-center d-none" id="header-ranking">Ranking</th>
                                         </tr>
                                     </thead>
@@ -181,13 +182,14 @@ $title = 'Judge';
         <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><strong>Scores Submitted Successfully</strong></h5>
+                    <!-- <h5 class="modal-title"><strong>Scores Submitted Successfully</strong></h5> -->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <h1 class="modal-title">
+                <div class="modal-body mx-auto text-center">
+                    <h1 class="modal-title text-center">
                         Scores Submitted Successfully
                     </h1>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
                 </div>
             </div>
         </div>

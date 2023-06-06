@@ -36,7 +36,8 @@ try{
         $html_table = '<div class="table-responsive">';
 
         $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
-        $html_table .= '<h3 class="text-center text-uppercase">'.$cri->criteria_name.'</h3>';
+        // $html_table .= '<h3 class="text-center text-uppercase">'.$cri->criteria_name.'</h3>';
+        $html_table .= '<h3 class="text-center text-uppercase">'.$cri->criteria_name.' ('.$cri->criteria_percentage.'%)</h3>';
         $html_table .= '<h4 class="text-center text-uppercase">('.$e->event_description.')</h4>';
         $html_table .= '<p class="text-center text-uppercase">('.date('F d, Y', strtotime($e->event_date)).' - '.date('H:i A', strtotime($e->event_time)).')</p>';
 

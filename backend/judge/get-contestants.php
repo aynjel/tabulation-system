@@ -36,7 +36,8 @@ try{
             'number' => $cd->contestant_number,
             'baranggay' => $cd->contestant_description,
             'score' => $contestant_score,
-            'rank' => $contestant_rank
+            'rank' => $contestant_rank,
+            'top_id' => $cd->top_id,
         ];
 
     }

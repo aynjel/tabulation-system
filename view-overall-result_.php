@@ -3,15 +3,10 @@
 require('./autoload.php');
 
 $event_id = Input::get('event_id');
-$top_id = Input::get('top_id');
 
 $event = new Event();
 
 $e = $event->find($event_id);
-
-$top = new Tops();
-
-$t = $top->find($top_id);
 
 $contestant = new Contestant();
 
@@ -19,7 +14,7 @@ $contestants = $contestant->findBy('event_id', $event_id);
 
 $criteria = new Criteria();
 
-$criterias = $criteria->findBy('top_id', $top_id);
+$criterias = $criteria->findBy('event_id', $event_id);
 
 $judge = new Judge();
 
@@ -97,12 +92,11 @@ foreach ($contestants as $key => $c) {
 
         $res = $contestant->GetAverageByCriteria($cri->id, $c->id);
 
-        // $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
-        $total_score += $res['score'];
+        $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
         $total_rank += $res['rank'];
         
-        $html .= "<td>" . $res['score'] . "</td>";
-        $html .= "<td>" . $res['rank'] . "</td>";
+        $html .= "<td>" . round($res['score'], 2) . "</td>";
+        $html .= "<td>" . round($res['rank'], 2) . "</td>";
 
     }
     

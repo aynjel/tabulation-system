@@ -7,6 +7,10 @@ try{
 
     $judge = new Judge();
 
+    $top = new Tops();
+
+    $tops = $top->findBy('is_show', 'true');
+
     $criteria = new Criteria();
 
     $cri = $criteria->findBy('event_id', $judge->getEventId());
@@ -25,6 +29,8 @@ try{
             'message' => 'Criteria showed.',
             'data' => [
                 'criteria_id' => $cr,
+                'criteria_percentage' => $criteria->find($cr)->criteria_percentage,
+                'top_id' => $criteria->find($cr)->top_id,
             ]
         ], JSON_PRETTY_PRINT);
     }else{

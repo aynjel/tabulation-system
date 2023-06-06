@@ -2,34 +2,35 @@
 
 require('./autoload.php');
 
-$criteria_id = Input::get('criteria_id');
 
 try{
 
+    $top = new Tops();
+
+    $tops = $top->findBy('is_show', 'true');
+
+    // get showed criteria
     $criteria = new Criteria();
 
-    $cri = $criteria->find($criteria_id);
-    
-    if($cri){
+    $cri = $criteria->findBy('is_show', 'true');
+
+    if(count($tops) > 0){
         echo json_encode([
             'status' => 'success',
-            'message' => 'Criteria found.',
-            'data' => [
-                'criteria_id' => $cri->id,
-                'criteria_name' => $cri->criteria_name,
-                'criteria_percentage' => $cri->criteria_percentage,
-            ]
+            'message' => 'Top showed.',
+            'top' => $tops[0],
+            'criteria' => $cri[0],
         ], JSON_PRETTY_PRINT);
     }else{
         echo json_encode([
             'status' => 'error',
-            'message' => 'Criteria not found.',
+            'message' => 'No top showed in this event.',
         ], JSON_PRETTY_PRINT);
     }
+
 }catch(Exception $e){
     echo json_encode([
         'status' => 'error',
         'message' => $e->getMessage()
     ], JSON_PRETTY_PRINT);
 }
-

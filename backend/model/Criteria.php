@@ -12,6 +12,10 @@ class Criteria extends Model{
         return $this->all();
     }
 
+    public function getCriteria($event_id){
+        return $this->findBy('event_id', $event_id);
+    }
+
     // get showed criteria is_show = true
     public function getShowedCriteria($event_id){
         $criterias = $this->findBy('event_id', $event_id);

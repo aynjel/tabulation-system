@@ -2,34 +2,35 @@
 
 require('./autoload.php');
 
-$event_id = Input::get('event_id');
-
-$event = new Event();
-
-$e = $event->find($event_id);
-
-$contestant = new Contestant();
-
-$contestants = $contestant->findBy('event_id', $event_id);
-
-$criteria = new Criteria();
-
-$criterias = $criteria->findBy('event_id', $event_id);
+$judge_id = Input::get('judge_id');
+// $judge_id = 36;
 
 $judge = new Judge();
 
-$judges = $judge->findBy('event_id', $event_id);
+$j = $judge->find($judge_id);
+
+$event = new Event();
+
+$e = $event->find($j->event_id);
+
+$contestant = new Contestant();
+
+$contestants = $contestant->getContestants($j->event_id);
+
+$criteria = new Criteria();
+
+$criterias = $criteria->getCriteria($j->event_id);
 
 $html = "";
 
 
 $html .= "<div class='table-responsive'>";
 
-$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . " | Live Result</h1>";
-$html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
+$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . " | Judge's Overall Result</h1>";
+$html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $j->judge_name)) . "</h3>";
 $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
-$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table'>";
+$html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;'>";
 $html .= "<thead>";
 
 $html .= "<tr class='text-uppercase text-center'>";
@@ -86,17 +87,17 @@ foreach ($contestants as $key => $c) {
 
     $total_score = 0;
     $total_rank = 0;
-    $total_scr = 0;
 
     foreach ($criterias as $cri) {
 
-        $res = $contestant->GetAverageByCriteria($cri->id, $c->id);
+        // get score by judge and criteria
+        $score = $contestant->getScoreByJudge($j->id,$cri->id, $c->id);
 
-        $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
-        $total_rank += $res['rank'];
-        
-        $html .= "<td>" . round($res['score'], 2) . "</td>";
-        $html .= "<td>" . round($res['rank'], 2) . "</td>";
+        $html .= "<td>" . $score['score'] . "</td>";
+        $html .= "<td>" . $score['rank'] . "</td>";
+
+        $total_score += $score['score'];
+        $total_rank += $score['rank'];
 
     }
     
@@ -132,4 +133,11 @@ $html .= "</tbody>";
 $html .= "</table>";
 $html .= "</div>";
 
-echo $html;
+// echo $html;
+
+echo json_encode([
+    'status' => 'success',
+    'message' => 'Judge result successfully generated.',
+    'html' => $html,
+    'judge' => $j->judge_name.' - '.$cri->criteria_name
+]);

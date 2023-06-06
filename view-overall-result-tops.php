@@ -15,7 +15,9 @@ $t = $top->find($top_id);
 
 $contestant = new Contestant();
 
-$contestants = $contestant->findBy('event_id', $event_id);
+$conts = $contestant->findBy('event_id', $event_id);
+
+$contestants = $contestant->findBy('top_id', $top_id);
 
 $criteria = new Criteria();
 
@@ -30,7 +32,7 @@ $html = "";
 
 $html .= "<div class='table-responsive' id='print'>";
 
-$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . "</h1>";
+$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . ' ' . $t->name . "</h1>";
 $html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
 $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
@@ -187,6 +189,22 @@ $html .= "</div>";
                         <i class="bi bi-printer"></i>
                         Print
                     </button>
+
+                    <button class="btn btn-primary btn-sm" onclick="EditContestantTops()">
+                        <i class="bi bi-pencil-square"></i>
+                        Contestant
+                    </button>
+
+                    <div class="d-inline-block float-end">
+                    <select name="top_id" id="top_id" class="form-control" onchange="window.location.href = './view-overall-result-tops.php?event_id=<?= $event_id; ?>&top_id=' + this.value">
+                        <option selected hidden disabled>Select Tops</option>
+                        <?php
+                            foreach($top->findBy('event_id', $event_id) as $t){
+                                echo '<option value="'.$t->id.'" '.($t->id == $top_id ? 'selected' : '').'>'.$t->name.'</option>';
+                            }
+                        ?>
+                    </select>
+                    </div>
                 </div>
                 <div class="card-body py-2">
                     <?= $html; ?>
@@ -209,6 +227,56 @@ $html .= "</div>";
         </div>
     </footer>
 
+    <div class="modal fade" id="editContestantTopsModal" tabindex="-1" aria-labelledby="addContestantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Edit Contestant Tops</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?php
+                if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                    $contestant_id = Input::get('contestant_id');
+                    $con = $contestant->find(Input::get('contestant_id'));
+
+                    if($con->top_id == null){
+                        $contestant->update($contestant_id, [
+                            'top_id' => $top_id
+                        ]);
+                    }else{
+                        $contestant->update($contestant_id, [
+                            'top_id' => null
+                        ]);
+                    }
+                    echo '<script>window.location.href = "./view-overall-result-tops.php?event_id='.$event_id.'&top_id='.$top_id.'"</script>';
+                }
+                ?>
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="contestant_id">Contestant Name</label>
+                                <select name="contestant_id" id="contestant_id" class="form-control">
+                                    <option selected hidden disabled>Select Contestant</option>
+                                    <?php
+                                        foreach($conts as $c) {
+                                            echo '<option value="'.$c->id.'">'.$c->contestant_number.' - '.$c->contestant_name.'</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
         <i class="bi bi-arrow-up-short"></i>
     </a>
@@ -220,6 +288,10 @@ $html .= "</div>";
     <!-- <script src="./js/overall.js"></script> -->
 
     <script>
+        function EditContestantTops(){
+            $("#editContestantTopsModal").modal('show');
+        }
+
         function PrintResult(){
             var printContents = document.getElementById("print").innerHTML;
             var originalContents = document.body.innerHTML;

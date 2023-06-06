@@ -3,15 +3,10 @@
 require('./autoload.php');
 
 $event_id = Input::get('event_id');
-$top_id = Input::get('top_id');
 
 $event = new Event();
 
 $e = $event->find($event_id);
-
-$top = new Tops();
-
-$t = $top->find($top_id);
 
 $contestant = new Contestant();
 
@@ -19,7 +14,7 @@ $contestants = $contestant->findBy('event_id', $event_id);
 
 $criteria = new Criteria();
 
-$criterias = $criteria->findBy('top_id', $top_id);
+$criterias = $criteria->findBy('event_id', $event_id);
 
 $judge = new Judge();
 
@@ -40,11 +35,6 @@ $html .= "<thead>";
 $html .= "<tr class='text-uppercase text-center'>";
 $html .= "<th colspan='3'>Contestant</th>";
 
-foreach ($criterias as $criteria) {
-    // $html .= "<th colspan='2'>" . $criteria->criteria_name . "</th>";
-    $html .= "<th colspan='2'>" . $criteria->criteria_name . " (". $criteria->criteria_percentage .")% </th>";
-}
-
 $html .= "<th colspan='2'>Overall</th>";
 $html .= "<th rowspan='2'>Ranking</th>";
 $html .= "</tr>";
@@ -53,11 +43,6 @@ $html .= "<tr class='text-center'>";
 $html .= "<th>No.</th>";
 $html .= "<th>Contingent</th>";
 $html .= "<th>Name</th>";
-
-foreach ($criterias as $criteria) {
-    $html .= "<th>Score</th>";
-    $html .= "<th>Rank</th>";
-}
 
 $html .= "<th>Total Score</th>";
 $html .= "<th>Total Rank</th>";
@@ -97,12 +82,8 @@ foreach ($contestants as $key => $c) {
 
         $res = $contestant->GetAverageByCriteria($cri->id, $c->id);
 
-        // $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
-        $total_score += $res['score'];
+        $total_score += ($res['score'] / 100) * $cri->criteria_percentage;
         $total_rank += $res['rank'];
-        
-        $html .= "<td>" . $res['score'] . "</td>";
-        $html .= "<td>" . $res['rank'] . "</td>";
 
     }
     

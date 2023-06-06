@@ -174,15 +174,23 @@ class Contestant extends Model{
 
         $total = 0;
         $rank = 0;
+        $data = [];
 
         foreach($scores as $s){
             if($s->contestant_id == $contestant_id && $s->judge_id == $judge_id){
                 $total += $s->score;
                 $rank += $s->rank;
             }
+            
+            $total = round($total, 2);
+
+            $data = [
+                'score' => $total,
+                'rank' => $rank,
+            ];
         }
 
-        return $total;
+        return $data;
     }
 
     public function getRanking($criteria_id, $contestant_id){

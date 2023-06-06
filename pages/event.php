@@ -8,6 +8,11 @@ $e = $event->find($event_id);
 
 if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.href = "./?page=events";</script>';}
 
+$top = new Tops();
+$tops = $top->findBy('event_id', $event_id);
+
+$contestant = new Contestant();
+$contestants = $contestant->findBy('event_id', $event_id);
 ?>
 
 <section class="section dashboard">
@@ -92,6 +97,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                         <table class="table table-hover table-bordered text-center" id="e-criterias-table">
                                             <thead>
                                                 <tr>
+                                                    <th scope="col">For</th>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Percentage</th>
                                                     <th scope="col">Status</th>
@@ -173,6 +179,60 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
 
     </div>
 </section>
+
+
+
+<div class="modal fade" id="viewTops" tabindex="-1" aria-labelledby="addOverallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong>
+                        Top
+                    </strong>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-create-tops">
+                    <input type="hidden" name="event_id" id="event_id" value="<?= $event_id ?>">
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                    <button type="button" id="submit-create-tops" class="btn btn-primary mt-3">
+                        Create
+                    </button>
+                </form>
+                <hr>
+                <div id="e-tops-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewJudgeOverallResultModal" tabindex="-1" aria-labelledby="addOverallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable" style="max-width: 100%; height: 100%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong>
+                        <span id="judge-overall-modal-name"></span>
+                    </strong>
+
+                    <div class="text-center mx-auto d-inline" id="print-btn-Overall">
+                        <button class="btn btn-primary btn-sm" onclick="PrintJudgeOverallResult()" id="print-btn-judge-overall">
+                        <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id='e-judge-overall-results-table'></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="viewOverallResultModal" tabindex="-1" aria-labelledby="addOverallModalLabel"
     aria-hidden="true">
@@ -307,7 +367,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                         </div>
                         <div class="mt-3">
                             <input type="hidden" name="create_event_id" id="create_event_id" value="<?= $event_id ?>">
-                            <button type="submit" class="btn btn-primary">Create Contestant</button>
+                            <button type="submit" class="btn btn-primary mt-2">Create</button>
                         </div>
                     </div>
                 </form>
@@ -381,9 +441,21 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                     class="form-control">
                             </div>
                         </div>
-                        <div class="mt-3">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="create_top_id">Criteria Top</label>
+                                <select name="create_top_id" id="create_top_id" class="form-control">
+                                    <option selected hidden disabled>Select Top</option>
+                                    <?php
+                                        foreach($tops as $t) {
+                                            echo '<option value="'.$t->id.'">'.$t->name.'</option>';
+                                        }
+                                    ?>
+                            </div>
+                        </div>
+                        <div class="mt-5">
                             <input type="hidden" name="create_event_id" id="create_event_id" value="<?= $event_id ?>">
-                            <button type="submit" class="btn btn-primary">Create Criteria</button>
+                            <button type="submit" class="btn btn-primary mt-2">Create Criteria</button>
                         </div>
                     </div>
                 </form>

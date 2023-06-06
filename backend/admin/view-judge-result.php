@@ -27,8 +27,8 @@ try{
     $html_table = '<div class="table-responsive">';
 
     $html_table .= '<h1 class="text-center text-uppercase">'.$e->event_name.'</h1>';
-    $html_table .= '<h3 class="text-center text-uppercase">'.$j->judge_name.' - Judge Scores</h3>';
-    $html_table .= '<h4 class="text-center text-uppercase">('.$cri->criteria_name.') - '.$e->event_description.'</h4>';
+    $html_table .= '<h3 class="text-center text-uppercase">'.$j->judge_name.' - Judge\'s Result</h3>';
+    $html_table .= '<h4 class="text-center text-uppercase">'.$cri->criteria_name.' ('.$cri->criteria_percentage.'%)</h4>';
 
     $html_table .= '<table class="table table-bordered table-hover table-striped table-sm text-center align-middle" style="width: 100%; font-size: 12px;" id="judge-result-table">';
     $html_table .= '<thead>';

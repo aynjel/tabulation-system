@@ -331,8 +331,9 @@ $title = ucwords(str_replace('-', ' ', $page));
                                 Results
                             </button>
                             <ul class="dropdown-menu">`;
+                            judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeOverallResult(${judge[i].id})">Overall Result (100%)</button></li>`;
                             $.each(data.criterias, function (key, value) {
-                                judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeResult(${judge[i].id},${value.id})">${value.criteria_name}</button></li>`;
+                                judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeResult(${judge[i].id},${value.id})">${value.criteria_name} (${value.criteria_percentage}%)</button></li>`;
                             });
                             `</ul></div></td>`;
                         judge_html += `<td><div class='btn-group'><button class='btn btn-sm btn-danger' onclick='DeleteJudge(${judge[i].id})'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditJudge(${judge[i].id })'><i class='bi bi-pencil'></i></button></div></td>`;
@@ -346,31 +347,32 @@ $title = ucwords(str_replace('-', ' ', $page));
                     for (var i = 0; i < criteria.length; i++) {
 
                         criteria_html += "<tr>";
-                        criteria_html += "<td>" + criteria[i].criteria_name + "</td>";
-                        criteria_html += "<td>" + criteria[i].criteria_percentage + "</td>";
+                        criteria_html += "<td>" + criteria[i].top_name + "</td>";
+                        criteria_html += "<td>" + criteria[i].criteria.criteria_name + "</td>";
+                        criteria_html += "<td>" + criteria[i].criteria.criteria_percentage + "</td>";
 
                         criteria_html += "<td>";
-                        if (criteria[i].is_show == 'true') {
+                        if (criteria[i].criteria.is_show == 'true') {
                             criteria_html +=
                                 '<button type="button" class="btn btn-sm btn-success" onclick="HideCriteria(' +
-                                criteria[i].id + ',' + data.event.id + ')">Hide</button>'
+                                criteria[i].criteria.id + ',' + data.event.id + ')">Hide</button>'
                         } else {
                             criteria_html +=
                                 '<button type="button" class="btn btn-sm btn-danger" onclick="ShowCriteria(' +
-                                criteria[i].id + ',' + data.event.id + ')">Show</button>'
+                                criteria[i].criteria.id + ',' + data.event.id + ')">Show</button>'
                         }
                         criteria_html += "</td>";
 
                         criteria_html +=
                             "<td><button class='btn btn-sm btn-primary' id='view-criteria-results-btn' onclick='ViewCriteriaResult(" +
-                            criteria[i].id +
+                            criteria[i].criteria.id +
                             ")'>Result</button></td>";
 
                         criteria_html +=
                             "<td><div class='btn-group' role='group'><button class='btn btn-sm btn-danger' onclick='DeleteCriteria(" +
-                            criteria[i].id +
+                            criteria[i].criteria.id +
                             ")'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditCriteria(" +
-                            criteria[i].id + ")'><i class='bi bi-pencil'></i></button></div></td>";
+                            criteria[i].criteria.id + ")'><i class='bi bi-pencil'></i></button></div></td>";
 
                         criteria_html += "</tr>";
                     }
@@ -394,11 +396,87 @@ $title = ucwords(str_replace('-', ' ', $page));
                     event_btn_html +=
                         '<button type="button" class="btn btn-sm btn-info text-white" onclick="GotoViewOverallResult(' + id + ')">Overall Result</button>';
 
+                    event_btn_html +=
+                        '<button type="button" class="btn btn-sm btn-primary text-white" onclick="GotoAnnounce(' + id + ')">Result</button>';
+
+                    event_btn_html +=
+                        '<button type="button" class="btn btn-sm btn-secondary text-white" onclick="ViewTops(' + id + ')">Top</button>';
+
                     event_btn_html += '</div>';
 
                     $("#e-event-btn").html(event_btn_html);
                 }
             });
+        }
+
+        function showTops(id,event_id){
+            $.ajax({
+                url: "./backend/admin/show-tops.php",
+                type: "POST",
+                data: {
+                    top_id: id,
+                    event_id: event_id
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data.status == 'success') {
+                        Toast(data.status, data.message);
+                        ViewTopsList(data.event_id);
+                    } else {
+                        Toast(data.status, data.message);
+                    }
+                }
+            });
+        }
+
+        function hideTops(id){
+            $.ajax({
+                url: "./backend/admin/hide-tops.php",
+                type: "POST",
+                data: {
+                    top_id: id
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data.status == 'success') {
+                        Toast(data.status, data.message);
+                        ViewTopsList(data.event_id);
+                    } else {
+                        Toast(data.status, data.message);
+                    }
+                }
+            });
+        }
+
+        function ViewTops(id) {
+            $("#viewTops").modal('show');
+
+            ViewTopsList(id);
+        }
+
+        function ViewTopsList(id) {
+            $.ajax({
+                url: "./backend/admin/view_tops_list.php",
+                type: "POST",
+                data: {
+                    event_id: id
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+
+                    if (data.status == 'success') {
+                        $("#e-tops-list").html(data.html);
+                        $("#e-tops-list").show();
+                    } else {
+                        Toast(data.status, data.message);
+                        $("#e-tops-list").hide();
+                    }
+                }
+            });
+        }
+
+        function GotoAnnounce(id) {
+            window.open("./announce.php?event_id=" + id, '_blank');
         }
 
         function GotoViewOverallResult(id) {
@@ -463,6 +541,42 @@ $title = ucwords(str_replace('-', ' ', $page));
                     }
                 }
             });
+        }
+
+        function ViewJudgeOverallResult(judge_id) {
+            Swal.fire({
+                title: 'Tallying Judge Overall Result...',
+                text: 'Please wait...',
+                icon: 'info',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+                $.ajax({
+                    url: "./backend/admin/view-judge-overall-result.php",
+                    type: "POST",
+                    data: {
+                        judge_id: judge_id
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.status == 'success') {
+                            $("#e-judge-overall-results-table").html(data.html);
+                            $("#judge-overall-modal-name").html(data.judge);
+                            $("#viewJudgeOverallResultModal").modal('show');
+                            Swal.close();
+                        } else {
+                            Toast(data.status, data.message);
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        Swal.close();
+                    }
+                });
         }
 
         function ViewCriteriaResult(criteria_id) {
@@ -1079,6 +1193,61 @@ $title = ucwords(str_replace('-', ' ', $page));
             });
         }
 
+        function deleteTops(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "./backend/admin/delete-tops.php",
+                        type: "POST",
+                        data: {
+                            delete_tops_id: id
+                        },
+                        success: function (data) {
+                            var obj = JSON.parse(data);
+                            if (obj.status == "success") {
+                                Toast(obj.status, obj.message);
+                                ViewTopsList( <?= Input::get('event_id') ?> );
+                            } else {
+                                Toast(obj.status, obj.message);
+                            }
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+            });
+        }
+
+        function editTops(id) {
+            $.ajax({
+                url: "./backend/admin/get-tops.php",
+                type: "POST",
+                data: {
+                    get_tops_id: id
+                },
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    $("#edit_tops_id").val(obj.id);
+                    $("#edit_tops_name").val(obj.name);
+                    $("#editTopsModal").modal("show");
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
         $(document).ready(function () {
 
             $(".toggle-sidebar-btn").on("click", function () {
@@ -1093,6 +1262,49 @@ $title = ucwords(str_replace('-', ' ', $page));
                 FetchEventData( <?= Input::get('event_id') ?> );
                 CurrentShowedCriteria( <?= Input::get('event_id') ?> );
             }
+
+            $("#submit-create-tops").on("click", function () {
+                var form = $("#form-create-tops");
+
+                $.ajax({
+                    url: "./backend/admin/create-tops.php",
+                    type: "POST",
+                    data: form.serialize(),
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status == 'success') {
+                            $("#form-create-tops")[0].reset();
+                            ViewTopsList( <?= Input::get('event_id') ?> );
+                            Toast(obj.status, obj.message);
+                        } else {
+                            Toast(obj.status, obj.message);
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            $("#form-edit-tops").on("submit", function (e) {
+                e.preventDefault();
+                var form_data = $(this).serialize();
+                $.ajax({
+                    url: "./backend/admin/edit-tops.php",
+                    type: "POST",
+                    data: form_data,
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status == 'success') {
+                            $("#editTopsModal").modal("hide");
+                            ViewTopsList( <?= Input::get('event_id') ?> );
+                            Toast(obj.status, obj.message);
+                        } else {
+                            Toast(obj.status, obj.message);
+                        }
+                    }
+                });
+            });
 
             //add
             $("#form-add-event").on("submit", function (e) {

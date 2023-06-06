@@ -23,6 +23,8 @@ function Toast(status, message) {
     var judge_id = 0;
     var event_id = 0;
     var criteria_id = 0;
+    var top_id = 0;
+    var criteria_percentage = 0;
 
     function CheckJudge(){
         $.ajax({
@@ -94,7 +96,10 @@ function Toast(status, message) {
                     
                     if(criteria_id != criteria.criteria_id){
                         criteria_id = criteria.criteria_id;
+                        top_id = criteria.top_id;
+                        criteria_percentage = criteria.criteria_percentage;
                         $("#header-ranking").addClass("d-none");
+                        $("#judge-scores-modal").modal('hide');
                         GetContestants();
                     }
 
@@ -113,7 +118,8 @@ function Toast(status, message) {
                 } else {
                     $("#judge-contestants-table").hide();
 
-                    $(".criteria-name").html("<span class='text-danger'>No criteria showed</span>");
+                    $(".criteria-name").html("<span class='text-danger'>No criteria show</span>");
+                    $(".criteria-percentage").html(" ");
                     $("#submit-score-btn").attr("disabled", true);
                     var forms = $(".form-score");
 
@@ -139,7 +145,9 @@ function Toast(status, message) {
                 if (result.status == "success") {
                     var criteria = result.data;
                     $(".criteria-name").html(criteria.criteria_name);
-                    // $(".criteria-percentage").html(criteria.criteria_percentage + "%");
+                    $(".criteria-percentage").html(criteria.criteria_percentage + "%");
+
+                    criteria_percentage = criteria.criteria_percentage;
                     
                     var forms = $(".form-score");
 
@@ -211,31 +219,33 @@ function Toast(status, message) {
                     var contestants = result.data;
                     var html = "";
                     for(var i = 0; i < contestants.length; i++){
-                        html += "<tr>";
-                        html += "<td class='text-center'>" + contestants[i].number + "</td>";
-                        html += "<td class='text-center'>" + contestants[i].baranggay + "</td>";
-                        html += "<td class='text-center'>" + contestants[i].name + "</td>";
-                        
-                        // check if the contestant has a score else show the score form
-                        if(contestants[i].score == null || contestants[i].score == 0 || contestants[i].rank == null || contestants[i].rank == 0){
-                            html += "<td class='text-center'>";
-                            html += "<form class='form-score'>";
-                            html += "<input type='hidden' name='contestant_id' value='" + contestants[i].id + "'>";
-                            html += "<input type='hidden' name='event_id' value='" + event_id + "'>";
-                            html += "<input type='hidden' name='judge_id' value='" + judge_id + "'>";
-                            html += "<input type='hidden' name='criteria_id' value='" + criteria_id + "'>";
-                            html += "<input type='number' name='score' class='form-control score text-center mx-auto w-50' min='0' max='10' step='0.01' placeholder='Score'>";
-                            html += "</form>";
-                            html += "</td>";
-                        } else {
-                            html += "<td class='text-success'>" + contestants[i].score + "</td>";
+                        // if(contestants[i].top_id == top_id){
+                            html += "<tr>";
+                            html += "<td class='text-center'>" + contestants[i].number + "</td>";
+                            html += "<td class='text-center'>" + contestants[i].baranggay + "</td>";
+                            html += "<td class='text-center'>" + contestants[i].name + "</td>";
+                            
+                            // check if the contestant has a score else show the score form
+                            if(contestants[i].score == null || contestants[i].score == 0 || contestants[i].rank == null || contestants[i].rank == 0){
+                                html += "<td class='text-center'>";
+                                html += "<form class='form-score'>";
+                                html += "<input type='hidden' name='contestant_id' value='" + contestants[i].id + "'>";
+                                html += "<input type='hidden' name='event_id' value='" + event_id + "'>";
+                                html += "<input type='hidden' name='judge_id' value='" + judge_id + "'>";
+                                html += "<input type='hidden' name='criteria_id' value='" + criteria_id + "'>";
+                                html += "<input type='number' name='score' class='form-control score text-center mx-auto w-50' min='0' max='" + criteria_percentage + "' step='0.01' placeholder='Score'>";
+                                // html += "<input type='number' name='score' class='form-control score text-center mx-auto w-50' min='0' max='10' step='0.01' placeholder='Score'>";
+                                html += "</form>";
+                                html += "</td>";
+                            } else {
+                                html += "<td class='text-success'>" + contestants[i].score + "</td>";
 
-                            $("#header-ranking").removeClass("d-none");
-                            html += "<td class='text-success'>" + contestants[i].rank + "</td>";
-                        }
+                                $("#header-ranking").removeClass("d-none");
+                                html += "<td class='text-success'>" + contestants[i].rank + "</td>";
+                            }
 
-                        
-                        html += "</tr>";
+                            html += "</tr>";
+                        // }
                     }
                     $("#j-contestants-table tbody").html(html);
 
@@ -361,38 +371,45 @@ function Toast(status, message) {
             GetShowedCriteria();
         }, 1000);
 
+        setInterval(function(){
+            $("#judge-scores-modal").modal('hide');
+        }, 3000);
+
     });
 
     // validate input score where judge can only input 1 to 10 score
     $(document).on("keyup", ".score", function(){
         var score = $(this).val();
-        if(score > 10){
+        if(score > parseInt(criteria_percentage)){
+        // if(score > 10){
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Score must be 1 to 10 only, You can also score with decimal',
+                text: `Score must be 1 to ${criteria_percentage} only, You can also score with decimal`,
+                // text: `Score must be 1 to 10 only, You can also score with decimal`,
             }).then((result) => {
                 $("#submit-all-score").attr("disabled", true);
                 $(this).val("");
-            });
-            $(this).css({
-                "border-color": "#dc3545",
-                "border-width": "2px",
-                "color": "#dc3545"
+                $(this).css({
+                    "border-color": "#dc3545",
+                    "border-width": "2px",
+                    "color": "#dc3545"
+                });
             });
         }else if(score < 0){
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Score must be 1 to 10 only, You can also score with decimal',
+                text: `Score must not empty, Score must be 1 to ${criteria_percentage} only, You can also score with decimal`,
+                // text: `Score must not empty, Score must be 1 to 10 only, You can also score with decimal`,
             }).then((result) => {
                 $("#submit-all-score").attr("disabled", true);
                 $(this).val("");
-            });
-            $(this).css({
-                "border-color": "#dc3545",
-                "border-width": "2px",
-                "color": "#dc3545"
+                $(this).css({
+                    "border-color": "#dc3545",
+                    "border-width": "2px",
+                    "color": "#dc3545"
+                });
             });
         }else{
             $(this).css({
@@ -401,6 +418,43 @@ function Toast(status, message) {
                 "color": "#28a745"
             });
         }
+
+        // if(score > 10){
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Oops...',
+        //         text: 'Score must be 1 to 10 only, You can also score with decimal',
+        //     }).then((result) => {
+        //         $("#submit-all-score").attr("disabled", true);
+        //         $(this).val("");
+        //     });
+        //     $(this).css({
+        //         "border-color": "#dc3545",
+        //         "border-width": "2px",
+        //         "color": "#dc3545"
+        //     });
+        // }else if(score < 0){
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Oops...',
+        //         text: 'Score must be 1 to 10 only, You can also score with decimal',
+        //     }).then((result) => {
+        //         $("#submit-all-score").attr("disabled", true);
+        //         $(this).val("");
+        //     });
+        //     $(this).css({
+        //         "border-color": "#dc3545",
+        //         "border-width": "2px",
+        //         "color": "#dc3545"
+        //     });
+        // }else{
+        //     $(this).css({
+        //         "border-color": "#28a745",
+        //         "border-width": "2px",
+        //         "color": "#28a745"
+        //     });
+        // }
+
 
         // check if all inout score is filled
         var forms = $(".form-score");
