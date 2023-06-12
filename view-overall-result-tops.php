@@ -32,19 +32,20 @@ $html = "";
 
 $html .= "<div class='table-responsive' id='print'>";
 
-$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . ' ' . $t->name . "</h1>";
-$html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
-$html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
+$html .= "<h1 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_name)) . ' - ' . $t->name . "</h1>";
+// $html .= "<h3 class='text-center text-uppercase'>" . ucwords(str_replace('_', ' ', $e->event_description)) . "</h3>";
+// $html .= "<p class='text-center text-uppercase'>(" . date('F d, Y', strtotime($e->event_date)) . " - " . date('H:i A', strtotime($e->event_time)) . ")</p>";
 
 $html .= "<table class='table table-bordered table-striped border-dark table-hover table-hover table-sm text-center align-middle' style='width: 100%; font-size: 12px; white-space: nowrap; align-items: center;' id='overall-result-table'>";
 $html .= "<thead>";
 
 $html .= "<tr class='text-uppercase text-center'>";
+// $html .= "<th rowspan='2'>No</th>";
 $html .= "<th colspan='3'>Contestant</th>";
 
 foreach ($criterias as $criteria) {
     // $html .= "<th colspan='2'>" . $criteria->criteria_name . "</th>";
-    $html .= "<th colspan='2'>" . $criteria->criteria_name . " (". $criteria->criteria_percentage .")% </th>";
+    $html .= "<th colspan='2'>" . $criteria->criteria_name . " (". $criteria->criteria_percentage .")</th>";
 }
 
 $html .= "<th colspan='2'>Overall</th>";
@@ -68,17 +69,20 @@ $html .= "</tr>";
 $html .= "</thead>";
 $html .= "<tbody>";
 
-// sort by total score average
+// sort by total rank average
 usort($contestants, function ($a, $b) use ($criterias, $contestant) {
     $total_a = 0;
     $total_b = 0;
-
+    
     foreach ($criterias as $cri) {
-        $total_a += $contestant->GetTotalByCriteria($cri->id, $a->id)['score'];
-        $total_b += $contestant->GetTotalByCriteria($cri->id, $b->id)['score'];
+        $res_a = $contestant->GetAverageByCriteria($cri->id, $a->id);
+        $res_b = $contestant->GetAverageByCriteria($cri->id, $b->id);
+
+        $total_a += $res_a['rank'];
+        $total_b += $res_b['rank'];
     }
 
-    return $total_b <=> $total_a;
+    return $total_a <=> $total_b;
 });
 
 $prev_score = null;
@@ -87,6 +91,7 @@ $prev_total_rank = 1;
 
 foreach ($contestants as $key => $c) {
     $html .= "<tr class='text-center'>";
+    // $html .= "<td>" . $key + 1 . "</td>";
     $html .= "<td>" . $c->contestant_number . "</td>";
     $html .= "<td>" . $c->contestant_description . "</td>";
     $html .= "<td>" . $c->contestant_name . "</td>";
@@ -108,8 +113,8 @@ foreach ($contestants as $key => $c) {
 
     }
     
-    $total_score = round($total_score, 2);
-    $total_rank = round($total_rank, 2);
+    // $total_score = round($total_score, 2);
+    // $total_rank = round($total_rank, 2);
 
     $html .= "<td>" . $total_score . "</td>";
     $html .= "<td>" . $total_rank . "</td>";
@@ -227,7 +232,7 @@ $html .= "</div>";
         </div>
     </footer>
 
-    <div class="modal fade" id="editContestantTopsModal" tabindex="-1" aria-labelledby="addContestantModalLabel" aria-hidden="true">
+<div class="modal fade" id="editContestantTopsModal" tabindex="-1" aria-labelledby="addContestantModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -237,18 +242,34 @@ $html .= "</div>";
             <div class="modal-body">
                 <?php
                 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                    $contestant_id = Input::get('contestant_id');
-                    $con = $contestant->find(Input::get('contestant_id'));
+                    // $contestant_id = Input::get('contestant_id');
+                    // $con = $contestant->find(Input::get('contestant_id'));
+                    
+                    // $contestant->update($contestant_id, [
+                    //     'top_id' => $top_id
+                    // ]);
 
-                    if($con->top_id == null){
-                        $contestant->update($contestant_id, [
+                    if(isset($_POST['show-all'])){
+                        $contestant->updateByEventId($event_id, [
                             'top_id' => $top_id
                         ]);
-                    }else{
-                        $contestant->update($contestant_id, [
-                            'top_id' => null
-                        ]);
                     }
+                    
+                    $is_show_true = Input::get('is_show_true');
+                    $is_show_false = Input::get('is_show_false');
+                    $contestant_id = Input::get('contestant_id');
+                    if(isset($_POST['submit'])){
+                        if($is_show_true){
+                            $contestant->update($contestant_id, [
+                                'top_id' => $top_id
+                            ]);
+                        }else{
+                            $contestant->update($contestant_id, [
+                                'top_id' => null
+                            ]);
+                        }
+                    }
+                    
                     echo '<script>window.location.href = "./view-overall-result-tops.php?event_id='.$event_id.'&top_id='.$top_id.'"</script>';
                 }
                 ?>
@@ -261,16 +282,31 @@ $html .= "</div>";
                                     <option selected hidden disabled>Select Contestant</option>
                                     <?php
                                         foreach($conts as $c) {
-                                            echo '<option value="'.$c->id.'">'.$c->contestant_number.' - '.$c->contestant_name.'</option>';
+                                            echo '<option value="'.$c->id.'">'.$c->contestant_number.' - '.$c->contestant_description.' - '. $c->contestant_name .'</option>';
                                         }
                                     ?>
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="is_show_false">Remove</label>
+                                <input type="checkbox" id="is_show_false" name="is_show_false">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="is_show_true">Show</label>
+                                <input type="checkbox" id="is_show_true" name="is_show_true">
+                            </div>
+                        </div>
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
+                </form>
+                <form method="POST">
+                    <button type="submit" name="show-all" class="btn btn-success">Show All</button>
                 </form>
             </div>
         </div>

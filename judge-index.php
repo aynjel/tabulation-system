@@ -98,8 +98,8 @@ $title = 'Judge';
 
                             <h3 class="card-text">
                                 <span class="text-uppercase criteria-name"></span>
-                                <span class="criteria-percentage"></span>
                             </h3>
+                            <span class="criteria-percentage"></span>
                         </div>
 
                         <div class="card-body">
@@ -112,7 +112,7 @@ $title = 'Judge';
                                             <th scope="col" class="text-center">Number</th>
                                             <th scope="col" class="text-center">Description</th>
                                             <th scope="col" class="text-center">Contingent</th>
-                                            <th scope="col" class="text-center">Score (1 - <span class="criteria-percentage"></span>)</th>
+                                            <th scope="col" class="text-center">Score (1 - <span class="criteria-percentage-col"></span>)</th>
                                             <th scope="col" class="text-center d-none" id="header-ranking">Ranking</th>
                                         </tr>
                                     </thead>

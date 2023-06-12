@@ -47,7 +47,7 @@ class Contestant extends Model{
                 $total_r += $s->rank;
             }
 
-            $total_s = round($total_s, 2);
+            // $total_s = round($total_s, 2);
         }
 
         return [
@@ -83,8 +83,10 @@ class Contestant extends Model{
 
         if($scores){
             return [
-                'score' => round($total_score_average / count($judges), 2),
-                'rank' => round($total_rank_average / count($judges), 2),
+                // 'score' => round($total_score_average / count($judges), 2),
+                // 'rank' => round($total_rank_average / count($judges), 2),
+                'score' => $total_score_average,
+                'rank' => $total_rank_average,
             ];
         }else{
             return [

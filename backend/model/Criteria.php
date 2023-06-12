@@ -27,9 +27,9 @@ class Criteria extends Model{
         }
     }
 
-    public function updateByEventId($event_id, $data){
-        $this->db->query("UPDATE $this->table SET is_show = '$data[is_show]' WHERE event_id = $event_id");
-    }
+    // public function updateByEventId($event_id, $data){
+    //     $this->db->query("UPDATE $this->table SET is_show = '$data[is_show]' WHERE event_id = $event_id");
+    // }
 
     public function findShowedCriteria($event_id){
         $criterias = $this->findBy('event_id', $event_id);

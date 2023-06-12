@@ -45,9 +45,14 @@ class Model {
         $this->db->insert($this->table, $fields);
         return $this->db->lastInsertId();
     }
-
+    
     public function update($id, $fields = []) {
         $this->db->update($this->table, $id, $fields);
+        return $this->db->lastInsertId();
+    }
+
+    public function updateByEventId($event_id, $fields = []) {
+        $this->db->updateByEventId($this->table, $event_id, $fields);
         return $this->db->lastInsertId();
     }
 

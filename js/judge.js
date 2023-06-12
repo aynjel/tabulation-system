@@ -118,7 +118,7 @@ function Toast(status, message) {
                 } else {
                     $("#judge-contestants-table").hide();
 
-                    $(".criteria-name").html("<span class='text-danger'>No criteria show</span>");
+                    $(".criteria-name").html("<span class='text-danger'>No criteria shown</span>");
                     $(".criteria-percentage").html(" ");
                     $("#submit-score-btn").attr("disabled", true);
                     var forms = $(".form-score");
@@ -144,8 +144,9 @@ function Toast(status, message) {
                 var result = JSON.parse(data);
                 if (result.status == "success") {
                     var criteria = result.data;
-                    $(".criteria-name").html(criteria.criteria_name);
-                    $(".criteria-percentage").html(criteria.criteria_percentage + "%");
+                    $(".criteria-name").html("Criteria: <strong>" + criteria.criteria_name + "</strong>");
+                    $(".criteria-percentage").html("Perfect Score: " + criteria.criteria_percentage);
+                    $(".criteria-percentage-col").html(criteria.criteria_percentage);
 
                     criteria_percentage = criteria.criteria_percentage;
                     
@@ -219,11 +220,11 @@ function Toast(status, message) {
                     var contestants = result.data;
                     var html = "";
                     for(var i = 0; i < contestants.length; i++){
-                        // if(contestants[i].top_id == top_id){
+                        if(contestants[i].top_id == top_id){
                             html += "<tr>";
                             html += "<td class='text-center'>" + contestants[i].number + "</td>";
-                            html += "<td class='text-center'>" + contestants[i].baranggay + "</td>";
-                            html += "<td class='text-center'>" + contestants[i].name + "</td>";
+                            html += "<td class='text-center text-uppercase'>" + contestants[i].baranggay + "</td>";
+                            html += "<td class='text-center text-uppercase'>" + contestants[i].name + "</td>";
                             
                             // check if the contestant has a score else show the score form
                             if(contestants[i].score == null || contestants[i].score == 0 || contestants[i].rank == null || contestants[i].rank == 0){
@@ -245,7 +246,7 @@ function Toast(status, message) {
                             }
 
                             html += "</tr>";
-                        // }
+                        }
                     }
                     $("#j-contestants-table tbody").html(html);
 

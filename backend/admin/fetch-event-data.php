@@ -31,8 +31,8 @@ foreach($criteria->findBy('event_id', $event_id) as $cri){
 }
 
 echo json_encode([
-    'contestants' => $contestant->findBy('event_id', $event_id, 'contestant_name'),
-    'judges' => $judge->findBy('event_id', $event_id, 'judge_name'),
+    'contestants' => $contestant->findBy('event_id', $event_id),
+    'judges' => $judge->findBy('event_id', $event_id),
     'criterias' => $criteria_tops,
     'event' => $e,
 ], JSON_PRETTY_PRINT);

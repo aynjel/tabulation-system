@@ -12,7 +12,7 @@ try{
     
     $contestant = new Contestant();
     
-    $contestants = $contestant->findBy('event_id', $cri->event_id);
+    $contestants = $contestant->findBy('top_id', $cri->top_id);
     
     $event = new Event();
     
@@ -50,8 +50,8 @@ try{
             $html_table .= '<th class="text-center" rowspan="2" colspan="2">'.$j->judge_name.'</th>';
         }
 
-        $html_table .= '<th class="text-center" colspan="2">Score</th>';
-        $html_table .= '<th class="text-center" colspan="3">Rank</th>';
+        $html_table .= '<th class="text-center">Score</th>';
+        $html_table .= '<th class="text-center" colspan="2">Rank</th>';
         $html_table .= '</tr>';
         $html_table .= '</thead>';
         $html_table .= '<tbody class="text-center">';
@@ -61,11 +61,11 @@ try{
             $total_b = 0;
 
             foreach($judges as $j){
-                $total_a += $score->GetScoreByContestantAndJudge($a->id, $j->id, $criteria_id)->score;
-                $total_b += $score->GetScoreByContestantAndJudge($b->id, $j->id, $criteria_id)->score;
+                $total_a += $score->GetScoreByContestantAndJudge($a->id, $j->id, $criteria_id)->rank;
+                $total_b += $score->GetScoreByContestantAndJudge($b->id, $j->id, $criteria_id)->rank;
             }
 
-            return $total_b <=> $total_a;
+            return $total_a <=> $total_b;
         });
 
         $html_table .= '<tr class="text-center text-uppercase">';
@@ -79,9 +79,7 @@ try{
         }
 
         $html_table .= '<th>Total</th>';
-        $html_table .= '<th>Average</th>';
         $html_table .= '<th>Total</th>';
-        $html_table .= '<th>Average</th>';
         $html_table .= '<th>No.</th>';
         $html_table .= '</tr>';
 
@@ -117,12 +115,8 @@ try{
             $total_score = round($total_score, 2);
 
             $html_table .= '<td>'.$total_score.'</td>';
-
-            $html_table .= '<td>'.round($total_score_average, 2).'</td>';
             
             $html_table .= '<td>'.$total_rank.'</td>';
-            
-            $html_table .= '<td>'.round($total_rank_average, 2).'</td>';
 
             if($prev_score == $total_score){
                 if($prev_total_rank == $total_rank){

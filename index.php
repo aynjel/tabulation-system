@@ -116,7 +116,9 @@ $title = ucwords(str_replace('-', ' ', $page));
             }else{
                 echo '<h1>404</h1>';
             }
-
+            
+            require('./pages/modal.php')
+            
         ?>
 
     </main>
@@ -333,7 +335,7 @@ $title = ucwords(str_replace('-', ' ', $page));
                             <ul class="dropdown-menu">`;
                             judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeOverallResult(${judge[i].id})">Overall Result (100%)</button></li>`;
                             $.each(data.criterias, function (key, value) {
-                                judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeResult(${judge[i].id},${value.id})">${value.criteria_name} (${value.criteria_percentage}%)</button></li>`;
+                                judge_html += `<li><button class="dropdown-item" onclick="ViewJudgeResult(${judge[i].id},${value.criteria.id})">${value.criteria.criteria_name} (${value.criteria.criteria_percentage}%)</button></li>`;
                             });
                             `</ul></div></td>`;
                         judge_html += `<td><div class='btn-group'><button class='btn btn-sm btn-danger' onclick='DeleteJudge(${judge[i].id})'><i class='bi bi-trash'></i></button><button class='btn btn-sm btn-warning' onclick='EditJudge(${judge[i].id })'><i class='bi bi-pencil'></i></button></div></td>`;
@@ -1038,6 +1040,7 @@ $title = ucwords(str_replace('-', ' ', $page));
                 },
                 success: function (data) {
                     var obj = JSON.parse(data);
+                    console.log(obj);
                     $("#edit_criteria_id").val(obj.id);
                     $("#edit_criteria_name").val(obj.criteria_name);
                     $("#edit_criteria_percentage").val(obj.criteria_percentage);
