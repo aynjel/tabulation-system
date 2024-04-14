@@ -2,7 +2,7 @@
 
 ### Description
 
-This project is a tabulation system for the 2023 Toledo City Fiesta. It is a web-based system that will be used to tabulate the scores of the different contingents that will be joining the fiesta.
+This project is a tabulation system for the 2023 Toledo City Fiesta. It is a web-based system that will be used to tabulate the scores of the different contingents that will be joining the fiesta events. The system has two types of users, the admin and the judges. The admin is responsible for managing the events, the criteria, the contingent registration, the score tabulation, and the announcement of winners. The judges, on the other hand, are responsible for encoding the scores of the contingents. The system is built using PHP, MySQL, and JavaScript.
 
 ### Features
 
