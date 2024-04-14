@@ -17,18 +17,17 @@ $criterias = $criteria->findBy('event_id', $event_id);
 ?>
 
 <section class="section dashboard">
+
     <div class="table-responsive">
 
-    <a href="result-export.php?event_id=<?= $event_id; ?>" class="btn btn-primary btn-lg mb-3">Export</a>
-
-        <table class="table table-bordered table-hover" id="resultTable" style="width: 100%;">
+        <table class="table table-bordered table-hover" id="final-result-table" style="width: 100%;">
             <thead>
                 <tr>
-                    <th>Number</th>
+                    <th>No.</th>
                     <th>Baranggay</th>
-                    <th>Candidate Name</th>
+                    <th>Name</th>
                     <?php foreach($criterias as $criteria): ?>
-                    <th><?= $criteria->criteria_name . ' (' . $criteria->criteria_percentage . '%)'; ?></th>
+                    <th><?= $criteria->criteria_name;?></th>
                     <?php endforeach; ?>
                     <th>Total</th>
                 </tr>
@@ -103,3 +102,35 @@ $criterias = $criteria->findBy('event_id', $event_id);
         </div>
     </div>
 </div>
+
+<script>
+    $("#final-result-table").DataTable({
+                paging: false,
+                dom: 'Bfrtip',
+                // buttons: [
+                //     'copy', 'csv', 'excel', 'pdf', 'print'
+                // ],
+                buttons: [
+                    {
+                        extend: 'print',
+                        title: '',
+                        text: 'Print',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        title: 'Criteria Result',
+                        text: 'Excel',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                ]
+            });
+</script>

@@ -263,7 +263,6 @@ $events = $event->all();
                     for (var i = 0; i < contestant.length; i++) {
 
                         contestant_html += "<tr>";
-                        contestant_html += "<td>" + contestant[i].id + "</td>";
                         contestant_html += "<td>" + contestant[i].contestant_number + "</td>";
                         contestant_html += "<td>" + contestant[i].contestant_name + "</td>";
                         contestant_html += "<td>" + contestant[i].contestant_description + "</td>";
@@ -298,7 +297,7 @@ $events = $event->all();
                         criteria_html += "<td>" + criteria[i].criteria_percentage + "</td>";
                         criteria_html += "<td>" + criteria[i].is_show + "</td>";
                         criteria_html +=
-                            "<td><a class='btn btn-sm btn-primary' href='criteria-result.php?criteria_id=" + criteria[i].id + "'>Result</a></td>";
+                            "<td><a class='btn btn-sm btn-primary' target='_blank' href='criteria-result.php?criteria_id=" + criteria[i].id + "'>Result</a></td>";
                         criteria_html += "</tr>";
                     }
                     $("#e-criterias-table tbody").html(criteria_html);
@@ -1102,35 +1101,39 @@ $events = $event->all();
                 }
             });
 
-            $("#criteria-result-table").DataTable({
-                paging: false,
-                dom: 'Bfrtip',
-                // buttons: [
-                //     'copy', 'csv', 'excel', 'pdf', 'print'
-                // ],
-                buttons: [
-                    {
-                        extend: 'print',
-                        title: 'Criteria Result',
-                        text: 'Print',
-                        exportOptions: {
-                            modifier: {
-                                page: 'current'
-                            }
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        title: 'Criteria Result',
-                        text: 'Excel',
-                        exportOptions: {
-                            modifier: {
-                                page: 'current'
-                            }
-                        }
-                    }
-                ]
-            });
+            $("#e-contestants-table").DataTable();
+
+            // $("#criteria-result-table").DataTable({
+            //     paging: false,
+            //     dom: 'Bfrtip',
+            //     // buttons: [
+            //     //     'copy', 'csv', 'excel', 'pdf', 'print'
+            //     // ],
+            //     buttons: [
+            //         {
+            //             extend: 'print',
+            //             title: 'Criteria Result',
+            //             text: 'Print',
+            //             exportOptions: {
+            //                 modifier: {
+            //                     page: 'current'
+            //                 }
+            //             }
+            //         },
+            //         {
+            //             extend: 'excel',
+            //             title: 'Criteria Result',
+            //             text: 'Excel',
+            //             exportOptions: {
+            //                 modifier: {
+            //                     page: 'current'
+            //                 }
+            //             }
+            //         }
+            //     ]
+            // });
+
+            
 
             
             // export_excel('#pinamungajan_table', 'Pinamungajan Customers List');

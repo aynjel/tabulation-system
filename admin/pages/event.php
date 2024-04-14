@@ -59,7 +59,7 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                         <button type="button" class="btn btn-success" id="start-event">Start
                                             Event</button>
                                         <?php endif; ?>
-                                        <a href="?page=result&event_id=<?= $e->id ?>" class="btn btn-primary" id="result-event">Event
+                                        <a href="result.php?&event_id=<?= $e->id ?>" class="btn btn-primary" target="_blank">Event
                                             Result</a>
                                     </form>
                                 </div>
@@ -92,7 +92,6 @@ if(!isset($event_id) || empty($event_id) || !$e) {echo '<script>window.location.
                                         <table class="table table-hover table-bordered" id="e-contestants-table">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Number</th>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Baranggay</th>
