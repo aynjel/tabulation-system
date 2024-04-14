@@ -16,8 +16,8 @@ class Model {
         return $this->db->query("SELECT * FROM {$this->table} WHERE id = ?", [$id])->first();
     }
 
-    public function findBy($field, $value) {
-        return $this->db->query("SELECT * FROM {$this->table} WHERE {$field} = ?", [$value])->results();
+    public function findBy($field, $value, $order = 'id', $sort = 'ASC') {
+        return $this->db->query("SELECT * FROM {$this->table} WHERE {$field} = ? ORDER BY {$order} {$sort}", [$value])->results();
     }
 
     public function findFirst($field, $value) {
@@ -45,9 +45,14 @@ class Model {
         $this->db->insert($this->table, $fields);
         return $this->db->lastInsertId();
     }
-
+    
     public function update($id, $fields = []) {
         $this->db->update($this->table, $id, $fields);
+        return $this->db->lastInsertId();
+    }
+
+    public function updateByEventId($event_id, $fields = []) {
+        $this->db->updateByEventId($this->table, $event_id, $fields);
         return $this->db->lastInsertId();
     }
 

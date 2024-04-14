@@ -13,10 +13,14 @@ $cr = 0;
 
 foreach($cri as $c){
     if($c->is_show == 'true'){
-        $cr = $c;
+        echo json_encode([
+            'status' => 'success',
+            'criteria' => $cr
+        ], JSON_PRETTY_PRINT);
+    }else{
+        echo json_encode([
+            'status' => 'error',
+            'criteria' => null
+        ], JSON_PRETTY_PRINT);
     }
 }
-echo json_encode([
-    'status' => 'success',
-    'criteria' => $cr
-], JSON_PRETTY_PRINT);

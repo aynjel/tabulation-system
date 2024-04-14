@@ -46,6 +46,10 @@ class Database{
         return $this->_lastInsertId;
     }
 
+    public function rowCount(){
+        return $this->_query->rowCount();
+    }
+
     public function error(){
         return $this->_error;
     }
@@ -106,6 +110,26 @@ class Database{
         $fieldString = rtrim($fieldString, ',');
 
         $sql = "UPDATE {$table} SET {$fieldString} WHERE id = {$id}";
+
+        if(!$this->query($sql, $values)->error()){
+            return true;
+        }
+        return false;
+    }
+
+    public function updateByEventId($table, $event_id, $fields = []){
+        $fieldString = '';
+        $values = [];
+
+        foreach($fields as $field => $value){
+            $fieldString .= ' ' . $field . ' = ?,';
+            $values[] = $value;
+        }
+
+        $fieldString = trim($fieldString);
+        $fieldString = rtrim($fieldString, ',');
+
+        $sql = "UPDATE {$table} SET {$fieldString} WHERE event_id = {$event_id}";
 
         if(!$this->query($sql, $values)->error()){
             return true;

@@ -9,7 +9,7 @@ class Event extends Model{
 
     // fetch all events from the database
     public function fetchEvents(){
-        return $this->all();
+        return $this->all('id', 'DESC');
     }
 
     public function EventById($id){

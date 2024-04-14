@@ -2,22 +2,34 @@
 
 require('./autoload.php');
 
-$event_id = Input::get('event_id');
+try{
 
-$event = new Event();
+    $judge = new Judge();
 
-$e = $event->find($event_id);
+    $event = new Event();
 
-if($e->is_start == 'true'){
+    $e = $event->find($judge->getEventId());
+
+    if($e->is_start == 'true'){
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Event started.',
+            'data' => [
+                'event_status' => 'started',
+            ]
+        ]);
+    }else{
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Event not started.',
+            'data' => [
+                'event_status' => 'not_started',
+            ]
+        ]);
+    }
+} catch(Exception $e){
     echo json_encode([
-        'status' => 'started',
-        'message' => 'Event started.',
-        'event' => $e
-    ]);
-}else{
-    echo json_encode([
-        'status' => 'not_started',
-        'message' => 'Event not started.',
-        'event' => $e
+        'status' => 'error',
+        'message' => $e->getMessage()
     ]);
 }

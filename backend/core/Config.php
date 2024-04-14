@@ -6,7 +6,7 @@ class Config{
             'host' => 'localhost',
             'username' => 'root',
             'password' => '',
-            'db' => 'tabulation_db'
+            'db' => 'tabulation'
         ],
         'email' => [
             'host' => 'smtp.gmail.com',
